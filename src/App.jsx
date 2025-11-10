@@ -1,9 +1,13 @@
 import "./App.css";
+import AppLayout from "./layout/AppLayout";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
     <>
-      <h1>FocusFlow</h1>
+      <AppLayout>
+        <Dashboard />
+      </AppLayout>
     </>
   );
 }
