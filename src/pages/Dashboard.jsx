@@ -1,3 +1,5 @@
+import Card from "../components/Card";
+
 export default function Dashboard() {
   const projects = [
     {
@@ -10,24 +12,32 @@ export default function Dashboard() {
     {
       id: 2,
       name: "AI Service Launch",
-      due: "2025-11-25",
-      progress: 30,
-      status: "at-risk",
+      due: "2025-11-15",
+      progress: 40,
+      status: "due-soon",
     },
     {
       id: 3,
       name: "Content Sprint",
-      due: "2025-11-15",
-      progress: 90,
-      status: "due-soon",
+      due: "2025-11-08",
+      progress: 15,
+      status: "overdue",
     },
   ];
-
   const todayTasks = [
-    { id: 1, title: "Write landing page copy", project: "Client Website" },
-    { id: 2, title: "Prepare AI demo", project: "AI Service Launch" },
+    {
+      id: 1,
+      title: "Write landing copy",
+      project: "Client Website",
+      priority: "high",
+    },
+    {
+      id: 2,
+      title: "Prep AI demo",
+      project: "AI Service Launch",
+      priority: "med",
+    },
   ];
-
   const overdueTasks = [
     {
       id: 1,
@@ -36,92 +46,104 @@ export default function Dashboard() {
       due: "2025-11-08",
     },
   ];
+
+  const statusColor = (s) =>
+    s === "on-track"
+      ? "text-emerald-600"
+      : s === "due-soon"
+      ? "text-amber-500"
+      : "text-red-500";
+  const statusIcon = (s) =>
+    s === "on-track" ? "✅" : s === "due-soon" ? "⚠️" : "⛔";
   return (
     <>
-      <div className="space-y-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <h1 className="text-2xl font-semibold pl-3 mb-14">Dashboard</h1>
+        {/* Projects overview */}
         <section>
-          <div className="flex gap-8">
-            <h3>Good morning, Yulia</h3>
-            <h3>Monday, November 10, 2025</h3>
+          <h2 className="pl-3 text-lg font-semibold text-gray-700 mb-4">
+            Projects
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-6">
+            {projects.map((p) => (
+              <Card key={p.id}>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-gray-800">{p.name}</h4>
+                  <span className={`${statusColor(p.status)}`}>
+                    {statusIcon(p.status)}
+                  </span>
+                </div>
+                <p className={`${statusColor(p.status)} text-sm`}>
+                  Due: {p.due}
+                </p>
+                <p className="text-xs text-gray-500">3/8 tasks completed</p>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-blue-500 h-2 rounded-full mt-4"
+                    style={{ width: `${p.progress}%` }}
+                  />
+                </div>
+              </Card>
+            ))}
           </div>
         </section>
-        <section>
-          <h2 className="text-xl font-semibold mb-3">Projects</h2>
-          <ul>
-            {projects.map((project) => (
-              <li key={project.id}>
-                <div className="p-4 border rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow">
-                  {/* Top row: project name + status icon */}
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-gray-800">
-                      {project.name}
-                    </h4>
+        {/* Today + Overdue */}
+        <section className="mt-10">
+          <h2 className="pl-3 text-lg font-semibold text-gray-700 mb-4">
+            Tasks Overview
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto px-6">
+            <Card>
+              <h3 className="text-md font-semibold mb-2">Today</h3>
+              <ul className="space-y-2">
+                {todayTasks.map((t) => (
+                  <li key={t.id} className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-800">{t.title}</p>
+                      <p className="text-xs text-gray-500">{t.project}</p>
+                    </div>
                     <span
                       className={
-                        project.status === "on-track"
-                          ? "text-emerald-600"
-                          : project.status === "due-soon"
+                        t.priority === "high"
+                          ? "text-red-500"
+                          : t.priority === "med"
                           ? "text-amber-500"
-                          : "text-red-500"
+                          : "text-gray-400"
                       }
                     >
-                      {project.status === "on-track"
-                        ? "✅"
-                        : project.status === "due-soon"
-                        ? "⚠️"
-                        : "⛔"}
+                      ●
                     </span>
-                  </div>
+                  </li>
+                ))}
+              </ul>
+            </Card>
 
-                  {/* Details */}
-                  <p
-                    className={
-                      project.status === "on-track"
-                        ? "text-sm text-emerald-600"
-                        : project.status === "due-soon"
-                        ? "text-sm text-amber-500"
-                        : "text-sm text-red-500"
-                    }
-                  >
-                    Due: {project.due}
-                  </p>
-
-                  <p className="text-xs text-gray-500 mb-2">
-                    3/8 tasks completed
-                  </p>
-
-                  {/* Progress bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-                    <div
-                      className="bg-blue-500 h-2 rounded-full"
-                      style={{ width: `${project.progress}%` }}
-                    />
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Today</h3>
-            {/* today list */}
-            <ul>
-              {todayTasks.map((task) => (
-                <li key={task.id}>{task.title}</li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Overdue</h3>
-            {/* overdue list */}
-            <ul>
-              {overdueTasks.map((overdue) => (
-                <li key={overdue.id}>{overdue.title}</li>
-              ))}
-            </ul>
+            <Card>
+              <h3 className="text-md font-semibold mb-2">Overdue / Upcoming</h3>
+              <ul className="space-y-2">
+                {overdueTasks.map((t) => (
+                  <li key={t.id} className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-800">{t.title}</p>
+                      <p className="text-xs text-red-500">
+                        {t.project} • due {t.due}
+                      </p>
+                    </div>
+                    <span className="text-red-500">⛔</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
           </div>
         </section>
+        {/* Tip */}
+        <div className="mt-14 bg-blue-50 py-3 rounded-md">
+          <p className="text-sm text-gray-500 pl-3 italic">
+            <span className="pr-1">💡</span>
+            Start with the task that unblocks others. Small wins compound.
+          </p>
+        </div>
       </div>
     </>
   );

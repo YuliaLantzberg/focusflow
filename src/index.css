@@ -1,1 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Keania+One&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
 @import "tailwindcss";
+
+@layer utilities {
+  .font-keania {
+    font-family: "Keania One", serif;
+  }
+  .font-dmsans {
+    font-family: "DM Sans", sans-serif;
+  }
+  .font-jakarta {
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+}

@@ -3,7 +3,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Projects from "./pages/Projects.jsx";
 import Tasks from "./pages/Tasks.jsx";
 import Profile from "./pages/Profile.jsx";
-import { useNavigation } from "./useNavigation.js";
+import { useNavigation } from "./contexts/navigation_context/useNavigation.js";
 
 export default function App() {
   const { activePage } = useNavigation();
