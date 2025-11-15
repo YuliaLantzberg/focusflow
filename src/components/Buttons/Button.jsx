@@ -10,7 +10,7 @@ export default function Button({
 }) {
   const Comp = as; // allows <Button as="a" href="#"> for true links
   const base =
-    "inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:opacity-60 disabled:cursor-not-allowed";
+    "inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 cursor-pointer";
   const sizes = {
     sm: "text-sm h-8 px-3",
     md: "text-sm h-10 px-4",
@@ -27,8 +27,8 @@ export default function Button({
     } hover:underline px-0 h-auto`, // no box
     ghost: "bg-transparent hover:bg-gray-100 text-gray-700",
     filter: isActive
-      ? "bg-blue-100 text-blue-700"
-      : "bg-transparent hover:bg-gray-100 text-gray-700",
+      ? "border-b-2 border-blue-300"
+      : "bg-transparent hover:bg-gray-50 text-gray-700",
   };
 
   return (
