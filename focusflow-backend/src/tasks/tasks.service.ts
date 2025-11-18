@@ -42,12 +42,7 @@ export class TasksService {
   }
 
   findAll(filter: GetTasksFilterDto) {
-    const { projectId, status } = filter;
-
-    // includeHidden may come as boolean or string from query, be defensive
-    const includeHidden =
-      (filter as any).includeHidden === true ||
-      (filter as any).includeHidden === 'true';
+    const { projectId, status, includeHidden } = filter;
 
     return this.prisma.task.findMany({
       where: {
@@ -65,11 +60,32 @@ export class TasksService {
     return this.prisma.task.findUnique({ where: { id, isVisible: true } });
   }
 
-  update(id: number, updateTaskDto: UpdateTaskDto) {
-    return `This action updates a #${id} task`;
+  update(id: string, updateTaskDto: UpdateTaskDto) {
+    return this.prisma.task.update({
+      where: {
+        id,
+      },
+      data: {
+        title: updateTaskDto.title,
+        description: updateTaskDto.description,
+        status: updateTaskDto.status,
+        priority: updateTaskDto.priority,
+        dueDate: updateTaskDto.dueDate,
+        order: updateTaskDto.order,
+        estimatedMinutes: updateTaskDto.estimatedMinutes,
+        timeSpentMinutes: updateTaskDto.timeSpentMinutes,
+        isBillable: updateTaskDto.isBillable,
+        cost: updateTaskDto.cost,
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+  remove(id: string) {
+    return this.prisma.task.update({
+      where: { id },
+      data: {
+        isVisible: false,
+      },
+    });
   }
 }
