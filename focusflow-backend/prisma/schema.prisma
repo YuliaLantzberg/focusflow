@@ -101,6 +101,8 @@ model Task {
   isBillable Boolean  @default(true)
   cost       Decimal? @db.Decimal(10, 2)
 
+  isVisible Boolean @default(true)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

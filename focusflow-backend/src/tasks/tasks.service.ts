@@ -61,8 +61,8 @@ export class TasksService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} task`;
+  findOne(id: string) {
+    return this.prisma.task.findUnique({ where: { id, isVisible: true } });
   }
 
   update(id: number, updateTaskDto: UpdateTaskDto) {
