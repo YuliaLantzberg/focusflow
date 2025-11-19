@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter-dto';
+import { MoveTaskDto } from './dto/move-task.dto';
 
 @Injectable()
 export class TasksService {
@@ -61,6 +62,7 @@ export class TasksService {
   }
 
   update(id: string, updateTaskDto: UpdateTaskDto) {
+    const { dueDate } = updateTaskDto;
     return this.prisma.task.update({
       where: {
         id,
@@ -70,7 +72,7 @@ export class TasksService {
         description: updateTaskDto.description,
         status: updateTaskDto.status,
         priority: updateTaskDto.priority,
-        dueDate: updateTaskDto.dueDate,
+        dueDate: dueDate ? new Date(dueDate) : undefined,
         order: updateTaskDto.order,
         estimatedMinutes: updateTaskDto.estimatedMinutes,
         timeSpentMinutes: updateTaskDto.timeSpentMinutes,
@@ -85,6 +87,17 @@ export class TasksService {
       where: { id },
       data: {
         isVisible: false,
+      },
+    });
+  }
+
+  move(id: string, moveTaskDto: MoveTaskDto) {
+    const { status, order } = moveTaskDto;
+    return this.prisma.task.update({
+      where: { id },
+      data: {
+        ...(order !== undefined && { order }),
+        ...(status !== undefined && { status }),
       },
     });
   }
