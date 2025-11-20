@@ -120,6 +120,8 @@ model ProjectNote {
   content  String
   isPinned Boolean @default(false)
 
+  isVisible Boolean @default(true)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -21,7 +21,7 @@ export class NotesService {
 
   findAll(projectId: string) {
     return this.prisma.projectNote.findMany({
-      where: { projectId },
+      where: { projectId, isVisible: true },
     });
   }
 
@@ -30,17 +30,26 @@ export class NotesService {
       where: { id },
     });
 
-    if (!note) {
+    // if note not exists or soft deleted
+    if (!note || !note.isVisible) {
       throw new NotFoundException(`Note ${id} is not found`);
     }
     return note;
   }
 
-  update(id: string, updateNoteDto: UpdateNoteDto) {
-    return `This action updates a #${id} note`;
+  async update(id: string, updateNoteDto: UpdateNoteDto) {
+    await this.findOne(id);
+    return this.prisma.projectNote.update({
+      where: { id },
+      data: updateNoteDto,
+    });
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} note`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.projectNote.update({
+      where: { id },
+      data: { isVisible: false },
+    });
   }
 }
