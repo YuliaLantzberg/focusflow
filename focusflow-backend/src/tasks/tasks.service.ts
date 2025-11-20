@@ -9,7 +9,7 @@ import { MoveTaskDto } from './dto/move-task.dto';
 export class TasksService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createTaskDto: CreateTaskDto) {
+  create(projectId, createTaskDto: CreateTaskDto) {
     const {
       title,
       description,
@@ -21,7 +21,6 @@ export class TasksService {
       timeSpentMinutes,
       isBillable,
       cost,
-      projectId,
     } = createTaskDto;
     return this.prisma.task.create({
       data: {
@@ -42,8 +41,8 @@ export class TasksService {
     });
   }
 
-  findAll(filter: GetTasksFilterDto) {
-    const { projectId, status, includeHidden } = filter;
+  findAll(projectId: string, filter: GetTasksFilterDto) {
+    const { status, includeHidden } = filter;
 
     return this.prisma.task.findMany({
       where: {

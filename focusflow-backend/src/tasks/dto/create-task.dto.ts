@@ -10,9 +10,6 @@ import {
 
 export class CreateTaskDto {
   @IsString()
-  projectId: string;
-
-  @IsString()
   title: string;
 
   @IsOptional()
