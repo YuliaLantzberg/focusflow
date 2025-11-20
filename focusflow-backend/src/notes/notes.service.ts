@@ -1,19 +1,39 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class NotesService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(projectId: string, createNoteDto: CreateNoteDto) {
-    return 'This action adds a new note';
+    const { title, content, isPinned } = createNoteDto;
+    return this.prisma.projectNote.create({
+      data: {
+        projectId,
+        title,
+        content,
+        isPinned,
+      },
+    });
   }
 
   findAll(projectId: string) {
-    return `This action returns all notes`;
+    return this.prisma.projectNote.findMany({
+      where: { projectId },
+    });
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} note`;
+  async findOne(id: string) {
+    const note = await this.prisma.projectNote.findUnique({
+      where: { id },
+    });
+
+    if (!note) {
+      throw new NotFoundException(`Note ${id} is not found`);
+    }
+    return note;
   }
 
   update(id: string, updateNoteDto: UpdateNoteDto) {
