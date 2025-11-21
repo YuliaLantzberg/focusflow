@@ -7,7 +7,9 @@ import {
   Param,
   Patch,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 // DTOs
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -21,6 +23,7 @@ import { ProjectsService } from './projects.service';
 import { TasksService } from 'src/tasks/tasks.service';
 import { NotesService } from 'src/notes/notes.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('projects')
 export class ProjectsController {
   constructor(
