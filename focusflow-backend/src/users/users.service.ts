@@ -10,4 +10,13 @@ export class UsersService {
       where: { email },
     });
   }
+
+  async createUser(data: {
+    email: string;
+    passwordHash: string;
+    name?: string;
+    timezone?: number;
+  }) {
+    // implementation later
+  }
 }
