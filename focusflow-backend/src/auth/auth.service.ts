@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 
@@ -33,6 +37,21 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    // implementation next
+    const user = await this.usersService.findByEmail(loginDto.email);
+    if (!user) {
+      throw new UnauthorizedException(
+        'The email or password you entered is incorrect.',
+      );
+    }
+
+    const isValid = await bcrypt.compare(loginDto.password, user.passwordHash);
+    if (!isValid)
+      throw new UnauthorizedException(
+        'The email or password you entered is incorrect.',
+      );
+
+    const payload = { sub: user.id, email: user.email };
+    const accessToken = await this.jwtService.signAsync(payload);
+    return { accessToken };
   }
 }
