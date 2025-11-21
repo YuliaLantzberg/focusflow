@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { GetTasksFilterDto } from './dto/get-tasks-filter-dto';
+import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { MoveTaskDto } from './dto/move-task.dto';
 
 @Injectable()

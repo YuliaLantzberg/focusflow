@@ -13,7 +13,7 @@ import {
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { CreateNoteDto } from 'src/notes/dto/create-note.dto';
-import { GetTasksFilterDto } from 'src/tasks/dto/get-tasks-filter-dto';
+import { GetTasksFilterDto } from 'src/tasks/dto/get-tasks-filter.dto';
 import { CreateTaskDto } from 'src/tasks/dto/create-task.dto';
 
 // Services
