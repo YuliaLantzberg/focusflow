@@ -19,6 +19,12 @@ export class AuthService {
 
   private readonly saltRounds = 10;
 
+  private async buildAuthResponse(user: { id: string; email: string }) {
+    const payload = { sub: user.id, email: user.email };
+    const access_token = await this.jwtService.signAsync(payload);
+    return { access_token };
+  }
+
   async signup(signupDto: SignupDto) {
     const user = await this.usersService.findByEmail(signupDto.email);
     if (user) {
@@ -33,7 +39,7 @@ export class AuthService {
       timezone: signupDto.timezone,
     });
 
-    return { id: newUser.id, email: newUser.email };
+    return this.buildAuthResponse({ id: newUser.id, email: newUser.email });
   }
 
   async login(loginDto: LoginDto) {
@@ -50,8 +56,6 @@ export class AuthService {
         'The email or password you entered is incorrect.',
       );
 
-    const payload = { sub: user.id, email: user.email };
-    const accessToken = await this.jwtService.signAsync(payload);
-    return { accessToken };
+    return this.buildAuthResponse({ id: user.id, email: user.email });
   }
 }
