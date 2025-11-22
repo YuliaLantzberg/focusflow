@@ -1,3 +1,58 @@
+"use client";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 export default function SignupPage() {
-  return <div>Signup Page</div>;
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    setError(null);
+
+    const res = await fetch("http://localhost:3000/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!res.ok) {
+      setError("Invalid Email or Password");
+      return;
+    }
+    const data = await res.json();
+    console.log(data);
+    const token = data.accessToken;
+    localStorage.setItem("ff_token", token);
+    console.log(token);
+    router.push("/dashboard");
+  };
+  return (
+    <>
+      <h1>Signup</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+          className="border border-black p-2 block mb-2"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          className="border border-black p-2 block mb-2"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button
+          type="submit"
+          className="border border-black px-4 py-2 cursor-pointer"
+        >
+          Signup
+        </button>
+      </form>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </>
+  );
 }
