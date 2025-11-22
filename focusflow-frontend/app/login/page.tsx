@@ -23,8 +23,10 @@ export default function LoginPage() {
       return;
     }
     const data = await res.json();
-    const token = data.access_token;
+    console.log(data);
+    const token = data.accessToken;
     localStorage.setItem("ff_token", token);
+    console.log(token);
     router.push("/dashboard");
   };
   return (
