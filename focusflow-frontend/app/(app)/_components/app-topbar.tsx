@@ -6,6 +6,7 @@ export default function AppTopbar() {
     "/dashboard": "Dashboard",
     "/projects": "Projects",
     "/tasks": "Tasks",
+    "/profile": "Profile",
   };
   const pageTitle = titleMap[pathname] ?? "FocusFlow";
   const today = new Date();
