@@ -28,8 +28,25 @@ export default function DashboardPage() {
   return (
     <PageContainer>
       <PageSection>
-        <h1>Dashboard Page</h1>
-        <p>You are logged in</p>
+        <h2 className="text-lg font-semibold text-slate-100">Today's Focus</h2>
+        <p className="text-sm text-slate-300">Coming soon...</p>
+      </PageSection>
+
+      <PageSection>
+        <h2 className="text-lg font-semibold text-slate-100">Quick Stats</h2>
+        <p className="text-sm text-slate-300">Stats will appear here.</p>
+      </PageSection>
+
+      <PageSection>
+        <h2 className="text-lg font-semibold text-slate-100">
+          Projects Overview
+        </h2>
+        <p className="text-sm text-slate-300">Project info coming soon.</p>
+      </PageSection>
+
+      <PageSection>
+        <h2 className="text-lg font-semibold text-slate-100">Tasks Overview</h2>
+        <p className="text-sm text-slate-300">Task info coming soon.</p>
       </PageSection>
     </PageContainer>
   );
