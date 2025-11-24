@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import PageContainer from "../_components/page-container";
+import PageSection from "../_components/page-section";
 
 export default function DashboardPage() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -13,18 +15,22 @@ export default function DashboardPage() {
 
   if (!isLoggedIn) {
     return (
-      <>
-        <h1>Dashboard</h1>
-        <p>You are not logged in.</p>
-        <Link href="/login">Go to login</Link>
-      </>
+      <PageContainer>
+        <PageSection>
+          <h1>Dashboard</h1>
+          <p>You are not logged in.</p>
+          <Link href="/login">Go to login</Link>
+        </PageSection>
+      </PageContainer>
     );
   }
 
   return (
-    <>
-      <h1>Dashboard Page</h1>
-      <p>You are logged in</p>
-    </>
+    <PageContainer>
+      <PageSection>
+        <h1>Dashboard Page</h1>
+        <p>You are logged in</p>
+      </PageSection>
+    </PageContainer>
   );
 }
