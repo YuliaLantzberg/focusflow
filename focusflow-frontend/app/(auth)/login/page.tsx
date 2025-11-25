@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import AuthCard from "../_components/AuthCard";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -31,7 +32,8 @@ export default function LoginPage() {
   };
   return (
     <>
-      <h1>Login</h1>
+      <AuthCard title="Login">Login</AuthCard>
+      {/* <h1>Login</h1>
       <form onSubmit={handleSubmit}>
         <input
           className="border border-black p-2 block mb-2"
@@ -52,7 +54,7 @@ export default function LoginPage() {
           Login
         </button>
       </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>} */}
     </>
   );
 }
