@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import AuthCard from "../_components/AuthCard";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -23,15 +24,17 @@ export default function SignupPage() {
       return;
     }
     const data = await res.json();
-    console.log(data);
+
     const token = data.accessToken;
     localStorage.setItem("ff_token", token);
-    console.log(token);
+
     router.push("/dashboard");
   };
   return (
-    <>
-      <h1>Signup</h1>
+    <AuthCard
+      title="Create Account"
+      subtitle="Sign up to start using FocusFlow"
+    >
       <form onSubmit={handleSubmit}>
         <input
           className="border border-black p-2 block mb-2"
@@ -53,6 +56,6 @@ export default function SignupPage() {
         </button>
       </form>
       {error && <p style={{ color: "red" }}>{error}</p>}
-    </>
+    </AuthCard>
   );
 }

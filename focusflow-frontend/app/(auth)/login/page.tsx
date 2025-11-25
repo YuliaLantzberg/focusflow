@@ -24,16 +24,14 @@ export default function LoginPage() {
       return;
     }
     const data = await res.json();
-    console.log(data);
+    // save token into the local storage
     const token = data.accessToken;
     localStorage.setItem("ff_token", token);
-    console.log(token);
     router.push("/dashboard");
   };
   return (
-    <>
-      <AuthCard title="Login">Login</AuthCard>
-      {/* <h1>Login</h1>
+    <AuthCard title="Welcome back" subtitle="Log in to your FocusFlow account">
+      {" "}
       <form onSubmit={handleSubmit}>
         <input
           className="border border-black p-2 block mb-2"
@@ -54,7 +52,7 @@ export default function LoginPage() {
           Login
         </button>
       </form>
-      {error && <p style={{ color: "red" }}>{error}</p>} */}
-    </>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </AuthCard>
   );
 }
