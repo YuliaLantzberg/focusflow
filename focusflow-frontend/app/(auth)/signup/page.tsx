@@ -31,12 +31,14 @@ export default function SignupPage() {
 
     router.push("/dashboard");
   };
+
+  const isDisabled = !email || !password;
   return (
     <AuthCard
       title="Create Account"
       subtitle="Sign up to start using FocusFlow"
     >
-      <form onSubmit={handleSubmit} className="space-y-6 mt-8">
+      <form onSubmit={handleSubmit} className="space-y-6 mt-8 mb-4">
         <AuthInput
           type="email"
           value={email}
@@ -53,12 +55,25 @@ export default function SignupPage() {
         />
         <button
           type="submit"
-          className="w-full py-3 rounded-xl bg-indigo-950 text-white text-base font-semibold tracking-wide hover:bg-indigo-800 transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+          disabled={isDisabled}
+          className={`w-full py-3 rounded-xl text-white text-base font-semibold tracking-wide ${
+            isDisabled
+              ? "bg-indigo-400/30"
+              : "bg-indigo-950 hover:bg-indigo-800 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+          }`}
         >
           Signup
         </button>
       </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      <p className="text-sm text-gray-400 text-center">
+        Already have an account?{" "}
+        <a href="/login" className="text-indigo-400 hover:underline">
+          Log in
+        </a>
+      </p>
+      {error && (
+        <p className="text-sm text-red-400 text-center mt-4">{error}</p>
+      )}
     </AuthCard>
   );
 }

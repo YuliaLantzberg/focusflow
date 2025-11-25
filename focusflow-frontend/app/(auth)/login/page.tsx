@@ -30,10 +30,12 @@ export default function LoginPage() {
     localStorage.setItem("ff_token", token);
     router.push("/dashboard");
   };
+
+  const isDisabled = !email || !password;
   return (
     <AuthCard title="Welcome back" subtitle="Log in to your FocusFlow account">
       {" "}
-      <form onSubmit={handleSubmit} className="space-y-6 mt-8">
+      <form onSubmit={handleSubmit} className="space-y-6 mt-8 mb-4">
         <AuthInput
           type="email"
           value={email}
@@ -48,14 +50,30 @@ export default function LoginPage() {
           label="Password"
           placeholder="Enter your password"
         />
+        <p className="text-xs text-gray-500 text-right hover:text-indigo-400 transition">
+          <a href="/forgot-password">Forgot your password? Reset it</a>
+        </p>
         <button
           type="submit"
-          className="w-full py-3 rounded-xl bg-indigo-950 text-white text-base font-semibold tracking-wide hover:bg-indigo-800 transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+          disabled={isDisabled}
+          className={`w-full py-3 rounded-xl text-white text-base font-semibold tracking-wide ${
+            isDisabled
+              ? "bg-indigo-400/30"
+              : "bg-indigo-950 hover:bg-indigo-800 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+          }`}
         >
           Login
         </button>
       </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      <p className="text-sm text-gray-400 text-center">
+        Don’t have an account?{" "}
+        <a href="/signup" className="text-indigo-400 hover:underline">
+          Sign up
+        </a>
+      </p>
+      {error && (
+        <p className="text-sm text-red-400 text-center mt-4">{error}</p>
+      )}
     </AuthCard>
   );
 }
