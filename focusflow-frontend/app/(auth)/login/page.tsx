@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import AuthCard from "../_components/AuthCard";
+import AuthInput from "../_components/AuthInput";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,22 +33,24 @@ export default function LoginPage() {
   return (
     <AuthCard title="Welcome back" subtitle="Log in to your FocusFlow account">
       {" "}
-      <form onSubmit={handleSubmit}>
-        <input
-          className="border border-black p-2 block mb-2"
+      <form onSubmit={handleSubmit} className="space-y-6 mt-8">
+        <AuthInput
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          label="Email"
+          placeholder="Enter your email"
         />
-        <input
-          className="border border-black p-2 block mb-2"
+        <AuthInput
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          label="Password"
+          placeholder="Enter your password"
         />
         <button
           type="submit"
-          className="border border-black px-4 py-2 cursor-pointer"
+          className="w-full py-3 rounded-xl bg-indigo-950 text-white text-base font-semibold tracking-wide hover:bg-indigo-800 transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900"
         >
           Login
         </button>
