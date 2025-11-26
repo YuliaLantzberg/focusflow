@@ -6,6 +6,7 @@ export function getToken() {
 
 export async function apiFetch(url: string, options?: RequestInit) {
   const token = getToken();
+  console.log(token);
   const optionsWithToken = {
     ...options,
     headers: {

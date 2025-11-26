@@ -26,7 +26,7 @@ export default function LoginPage() {
     }
     const data = await res.json();
     // save token into the local storage
-    const token = data.accessToken;
+    const token = data.access_token;
     localStorage.setItem("ff_token", token);
     router.push("/dashboard");
   };
