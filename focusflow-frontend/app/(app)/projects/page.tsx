@@ -34,7 +34,10 @@ export default function ProjectsPage() {
         <Link key={project.id} href={`/projects/${project.id}`}>
           <PageSection>
             <h2>{project.name}</h2>
-            <p>{project.status}</p>
+            <p>Status: {project.status}</p>
+            {project.description && <p>{project.description}</p>}
+            {project.clientCompany && <p>{project.clientCompany}</p>}
+            {project.dueDate && <p>Due Date: {project.dueDate}</p>}
           </PageSection>
         </Link>
       ))}

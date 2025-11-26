@@ -1,7 +1,8 @@
 export interface Project {
   id: string;
   name: string;
-  description: string;
+  description?: string | null;
   status: string;
-  createdAt?: string;
+  clientCompany?: string | null;
+  dueDate?: string | null;
 }
