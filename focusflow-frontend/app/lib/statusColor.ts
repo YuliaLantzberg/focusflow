@@ -1,10 +1,10 @@
 export function getProjectStatusColor(status: string): string {
   const statusColor: Record<string, string> = {
-    PLANNING: "bg-gray-400",
-    ACTIVE: "bg-blue-500",
-    COMPLETED: "bg-green-500",
-    ON_HOLD: "bg-yellow-500",
-    ARCHIVED: "bg-gray-600",
+    PLANNING: "bg-slate-500/50",
+    ACTIVE: "bg-sky-500/30",
+    COMPLETED: "bg-emerald-600/50",
+    ON_HOLD: "bg-amber-500/50",
+    ARCHIVED: "bg-zinc-700/60",
   };
   if (!statusColor[status]) return "bg-gray-400";
   return statusColor[status];
