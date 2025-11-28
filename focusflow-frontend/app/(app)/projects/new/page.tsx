@@ -4,6 +4,11 @@ import { useState } from "react";
 import PageContainer from "../../_components/page-container";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/app/lib/apiClient";
+import { PageTitle } from "../../_components/page-title";
+import PageSection from "../../_components/page-section";
+import FormCard from "../../_components/forms/form-card";
+import { FormField } from "../../_components/forms/form-field";
+import SubmitButton from "../../_components/buttons/submit-button";
 
 export default function NewProjectPage() {
   const router = useRouter();
@@ -30,22 +35,29 @@ export default function NewProjectPage() {
 
   return (
     <PageContainer>
-      <h1>New Project</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="border border-white"
-        />
-        <textarea
-          name="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="border border-white"
-        ></textarea>
-        <button type="submit">Create Project</button>
-      </form>
+      <PageTitle>New Project</PageTitle>
+      <PageSection>
+        <FormCard handleSubmit={handleSubmit}>
+          <FormField label="Project name">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Website redesign for client X"
+              className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
+            />
+          </FormField>
+          <FormField label="Description">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Short summary of the project..."
+              className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700 min-h-32 resize-none"
+            />
+          </FormField>
+          <SubmitButton>Create Project</SubmitButton>
+        </FormCard>
+      </PageSection>
     </PageContainer>
   );
 }
