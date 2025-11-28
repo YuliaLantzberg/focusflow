@@ -6,6 +6,8 @@ import PageSection from "../_components/page-section";
 import { Project } from "@/app/types/project";
 import { getProjectStatusColor } from "@/app/lib/statusColor";
 import Link from "next/link";
+import Badge from "../_components/badge";
+import { ListItem } from "../_components/list-item";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -41,41 +43,30 @@ export default function ProjectsPage() {
             href={`/projects/${project.id}`}
             className="block"
           >
-            <PageSection>
-              <div className="px-4 py-3 md:px-6 md:py-4">
-                <div className="flex justify-between items-center">
-                  <div className="space-y-2 flex-1">
-                    <div className="flex flex-col items-start gap-2">
-                      <h2 className="text-lg font-medium text-gray-100">
-                        {project.name}
-                      </h2>
-                      {project.description && (
-                        <p className="text-gray-300">{project.description}</p>
-                      )}
-                      {(project.clientCompany || project.dueDate) && (
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
-                          {project.clientCompany && (
-                            <p>{project.clientCompany}</p>
-                          )}
-                          {project.dueDate && (
-                            <p>Due Date: {project.dueDate}</p>
-                          )}
-                        </div>
-                      )}
-                    </div>
+            <ListItem
+              right={
+                <Badge
+                  label={project.status}
+                  colorClass={getProjectStatusColor(project.status)}
+                  className="w-24"
+                />
+              }
+            >
+              <div className="flex flex-col items-start gap-2">
+                <h2 className="text-lg font-medium text-gray-100">
+                  {project.name}
+                </h2>
+                {project.description && (
+                  <p className="text-gray-300">{project.description}</p>
+                )}
+                {(project.clientCompany || project.dueDate) && (
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+                    {project.clientCompany && <p>{project.clientCompany}</p>}
+                    {project.dueDate && <p>Due Date: {project.dueDate}</p>}
                   </div>
-                  <div className="flex items-center justify-between gap-4">
-                    <p
-                      className={`inline-flex items-center justify-center w-28 py-1.5 rounded-se-lg text-xs md:text-sm text-white  ${getProjectStatusColor(
-                        project.status
-                      )}`}
-                    >
-                      {project.status}
-                    </p>
-                  </div>
-                </div>
+                )}
               </div>
-            </PageSection>
+            </ListItem>
           </Link>
         ))}
       </div>
