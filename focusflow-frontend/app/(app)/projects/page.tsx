@@ -1,13 +1,19 @@
 "use client";
+// Libraries
 import { useState, useEffect } from "react";
-import PageContainer from "../_components/page-container";
+import Link from "next/link";
+
+// Custom Libraries
 import { apiFetch } from "@/app/lib/apiClient";
-import PageSection from "../_components/page-section";
 import { Project } from "@/app/types/project";
 import { getProjectStatusColor } from "@/app/lib/statusColor";
-import Link from "next/link";
+import PageContainer from "../_components/page-container";
+
+// Components
 import Badge from "../_components/badge";
 import { ListItem } from "../_components/list-item";
+import { PageTitle } from "../_components/page-title";
+import { CreateNewButton } from "../_components/buttons/create-new-button";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -28,13 +34,9 @@ export default function ProjectsPage() {
   return (
     <PageContainer>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-semibold text-gray-100">Projects</h1>
+        <PageTitle>Projects</PageTitle>
 
-        <Link href="/projects/new">
-          <button className="inline-flex items-center gap-2 rounded-lg bg-sky-400/60 px-4 py-3 text-sm font-medium cursor-pointer text-white hover:bg-sky-300/60 transition-colors">
-            Create New Project
-          </button>
-        </Link>
+        <CreateNewButton href="/projects/new" label="Create New Project" />
       </div>
       <div className="mt-4 max-w-3xl mx-auto space-y-4">
         {projects.map((project) => (
