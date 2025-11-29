@@ -3,15 +3,17 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 
 import PageContainer from "../../_components/page-container";
-import { loadData } from "@/app/lib/apiClient";
+import { loadData, moveTask } from "@/app/lib/apiClient";
 import { getProjectStatusColor } from "@/app/lib/statusColor";
 
 import { Project } from "@/app/types/project";
-import { Task } from "@/app/types/task";
+import { Task, TaskStatus } from "@/app/types/task";
 
 import { PageTitle } from "../../_components/page-title";
 import Badge from "../../_components/badge";
 import PageSection from "../../_components/page-section";
+import TaskCard from "../../_components/task-card";
+import { CardTitle } from "../../_components/card-title";
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -27,6 +29,17 @@ export default function ProjectDetailPage() {
       .then(setTasks)
       .catch(console.error);
   }, [projectId]);
+
+  const handleMove = async (taskId: string, status: TaskStatus) => {
+    try {
+      const updated = await moveTask(taskId, status);
+      setTasks((prev) =>
+        prev.map((task) => (task.id === taskId ? updated : task))
+      );
+    } catch (err) {
+      console.error("Failed to move task", err);
+    }
+  };
 
   if (!project)
     return (
@@ -51,7 +64,7 @@ export default function ProjectDetailPage() {
           className="w-24"
         />
       </div>
-      <div className="max-w-3xl space-y-4">
+      <div className="space-y-4">
         <div className="rounded-lg border border-white/5 bg-white/5 px-4 py-3 md:px-6 md:py-4 space-y-3">
           {project.description && (
             <p className="text-gray-300">{project.description}</p>
@@ -70,31 +83,51 @@ export default function ProjectDetailPage() {
           <h3>Total tasks: {tasks.length}</h3>
           <div className="grid gap-4 lg:grid-cols-4">
             <PageSection>
-              <h3>TODO</h3>
-              {todoTasks.map((task) => (
-                <p key={task.id}>{task.title}</p>
-              ))}
+              <CardTitle color="text-cyan-500/50">TODO</CardTitle>
+              <div className="space-y-3">
+                {todoTasks.map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onMove={(status) => handleMove(task.id, status)}
+                  />
+                ))}
+              </div>
             </PageSection>
 
             <PageSection>
-              <h3>In Progress</h3>
-              {inProgressTasks.map((task) => (
-                <p key={task.id}>{task.title}</p>
-              ))}
+              <CardTitle color="text-yellow-500/50">In Progress</CardTitle>
+              <div className="space-y-3">
+                {inProgressTasks.map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onMove={(status) => handleMove(task.id, status)}
+                  />
+                ))}
+              </div>
             </PageSection>
 
             <PageSection>
-              <h3>Completed</h3>
-              {completedTasks.map((task) => (
-                <p key={task.id}>{task.title}</p>
-              ))}
+              <CardTitle color="text-zinc-500/50">Blocked</CardTitle>
+              <div className="space-y-3">
+                {blockedTasks.map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onMove={(status) => handleMove(task.id, status)}
+                  />
+                ))}
+              </div>
             </PageSection>
 
             <PageSection>
-              <h3>Blocked Tasks</h3>
-              {blockedTasks.map((task) => (
-                <p key={task.id}>{task.title}</p>
-              ))}
+              <CardTitle color="text-emerald-500/50">Completed</CardTitle>
+              <div className="space-y-3">
+                {completedTasks.map((task) => (
+                  <TaskCard key={task.id} task={task} />
+                ))}
+              </div>
             </PageSection>
           </div>
         </div>
