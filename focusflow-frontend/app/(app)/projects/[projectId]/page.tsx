@@ -3,31 +3,30 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 
 import PageContainer from "../../_components/page-container";
-import { apiFetch } from "@/app/lib/apiClient";
-import { Project } from "@/app/types/project";
+import { loadData } from "@/app/lib/apiClient";
 import { getProjectStatusColor } from "@/app/lib/statusColor";
+
+import { Project } from "@/app/types/project";
+import { Task } from "@/app/types/task";
 
 import { PageTitle } from "../../_components/page-title";
 import Badge from "../../_components/badge";
 
 export default function ProjectDetailPage() {
-  const { projectId } = useParams();
+  const { projectId } = useParams<{ projectId: string }>();
   const [project, setProject] = useState<Project | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   useEffect(() => {
-    const loadProject = async () => {
-      try {
-        const res = await apiFetch(
-          `http://localhost:3000/projects/${projectId}`
-        );
-        const data = await res.json();
-        setProject(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    loadProject();
+    loadData<Project>(`http://localhost:3000/projects/${projectId}`)
+      .then(setProject)
+      .catch(console.error);
+
+    loadData<Task[]>(`http://localhost:3000/projects/${projectId}/tasks`)
+      .then(setTasks)
+      .catch(console.error);
   }, [projectId]);
+
   if (!project)
     return (
       <PageContainer>
@@ -61,7 +60,12 @@ export default function ProjectDetailPage() {
         {/* Tasks section */}
         <div className="rounded-lg border border-white/5 bg-white/5 px-4 py-3 md:px-6 md:py-4 space-y-2">
           <h2 className="text-lg font-medium text-gray-100">Tasks</h2>
-          <p className="text-sm text-gray-400">Tasks UI coming soon.</p>
+          <h3>Total tasks: {tasks.length}</h3>
+          {tasks.map((task) => (
+            <div key={task.id}>
+              <p>{task.title}</p>
+            </div>
+          ))}
         </div>
 
         {/* Notes section */}

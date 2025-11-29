@@ -6,7 +6,6 @@ export function getToken() {
 
 export async function apiFetch(url: string, options?: RequestInit) {
   const token = getToken();
-  console.log(token);
   const optionsWithToken = {
     ...options,
     headers: {
@@ -16,4 +15,15 @@ export async function apiFetch(url: string, options?: RequestInit) {
   };
   const res = await fetch(url, optionsWithToken);
   return res;
+}
+
+export async function loadData<T>(
+  url: string,
+  options?: RequestInit
+): Promise<T> {
+  const res = await apiFetch(url, options);
+  if (!res.ok) {
+    throw new Error(`Failed fetching ${url}: ${res.status}`);
+  }
+  return res.json();
 }

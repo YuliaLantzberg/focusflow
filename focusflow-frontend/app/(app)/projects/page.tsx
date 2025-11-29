@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 // Custom Libraries
-import { apiFetch } from "@/app/lib/apiClient";
+import { loadData } from "@/app/lib/apiClient";
 import { Project } from "@/app/types/project";
 import { getProjectStatusColor } from "@/app/lib/statusColor";
 import PageContainer from "../_components/page-container";
@@ -19,17 +19,9 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
 
   useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        const res = await apiFetch("http://localhost:3000/projects");
-        const data = await res.json();
-        setProjects(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    loadProjects();
+    loadData<Project[]>(`http://localhost:3000/projects/`)
+      .then(setProjects)
+      .catch(console.error);
   }, []);
   return (
     <PageContainer>
