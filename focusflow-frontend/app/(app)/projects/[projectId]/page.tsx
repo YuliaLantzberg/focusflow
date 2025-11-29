@@ -11,6 +11,7 @@ import { Task } from "@/app/types/task";
 
 import { PageTitle } from "../../_components/page-title";
 import Badge from "../../_components/badge";
+import PageSection from "../../_components/page-section";
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -33,6 +34,12 @@ export default function ProjectDetailPage() {
         <p>Loading...</p>
       </PageContainer>
     );
+
+  const todoTasks = tasks.filter((t) => t.status === "TODO");
+  const inProgressTasks = tasks.filter((t) => t.status === "IN_PROGRESS");
+  const blockedTasks = tasks.filter((t) => t.status === "BLOCKED");
+  const completedTasks = tasks.filter((t) => t.status === "DONE");
+
   return (
     <PageContainer>
       <div className="flex items-center justify-between mb-6">
@@ -61,11 +68,35 @@ export default function ProjectDetailPage() {
         <div className="rounded-lg border border-white/5 bg-white/5 px-4 py-3 md:px-6 md:py-4 space-y-2">
           <h2 className="text-lg font-medium text-gray-100">Tasks</h2>
           <h3>Total tasks: {tasks.length}</h3>
-          {tasks.map((task) => (
-            <div key={task.id}>
-              <p>{task.title}</p>
-            </div>
-          ))}
+          <div className="grid gap-4 lg:grid-cols-4">
+            <PageSection>
+              <h3>TODO</h3>
+              {todoTasks.map((task) => (
+                <p key={task.id}>{task.title}</p>
+              ))}
+            </PageSection>
+
+            <PageSection>
+              <h3>In Progress</h3>
+              {inProgressTasks.map((task) => (
+                <p key={task.id}>{task.title}</p>
+              ))}
+            </PageSection>
+
+            <PageSection>
+              <h3>Completed</h3>
+              {completedTasks.map((task) => (
+                <p key={task.id}>{task.title}</p>
+              ))}
+            </PageSection>
+
+            <PageSection>
+              <h3>Blocked Tasks</h3>
+              {blockedTasks.map((task) => (
+                <p key={task.id}>{task.title}</p>
+              ))}
+            </PageSection>
+          </div>
         </div>
 
         {/* Notes section */}
