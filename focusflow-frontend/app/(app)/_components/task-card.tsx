@@ -5,11 +5,6 @@ type TaskCardProps = {
   className?: string;
   onMove?: (status: TaskStatus) => void | Promise<void>;
 };
-
-type TaskMoveBtnProps = {
-  status: TaskStatus;
-  onMove?: (status: TaskStatus) => void | Promise<void>;
-};
 type TaskDropdownMenuProps = {
   status: TaskStatus;
   onMove?: (status: TaskStatus) => void | Promise<void>;
@@ -54,33 +49,6 @@ function TaskDropdownMenu({ status, onMove }: TaskDropdownMenuProps) {
   );
 }
 
-function TaskMoveButton({ status, onMove }: TaskMoveBtnProps) {
-  if (!onMove) return null;
-  let newStatus: TaskStatus = "DONE";
-  switch (status) {
-    case "TODO":
-      newStatus = "IN_PROGRESS";
-      break;
-    case "IN_PROGRESS":
-      newStatus = "DONE";
-      break;
-    case "BLOCKED":
-      newStatus = "IN_PROGRESS";
-      break;
-    case "DONE":
-    default:
-      return null;
-  }
-  return (
-    <button
-      className="self-start text-xs text-indigo-300 hover:underline cursor-pointer"
-      onClick={() => onMove(newStatus)}
-    >
-      → Move to <span>{newStatus}</span>
-    </button>
-  );
-}
-
 export default function TaskCard({ task, className, onMove }: TaskCardProps) {
   return (
     <div
@@ -90,7 +58,6 @@ export default function TaskCard({ task, className, onMove }: TaskCardProps) {
       {task.description && (
         <p className="text-xs text-gray-400">{task.description}</p>
       )}
-      {/* <TaskMoveButton status={task.status} onMove={onMove} /> */}
       <TaskDropdownMenu status={task.status} onMove={onMove} />
     </div>
   );
