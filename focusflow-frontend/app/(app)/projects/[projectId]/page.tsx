@@ -126,7 +126,11 @@ export default function ProjectDetailPage() {
               <CardTitle color="text-emerald-500/50">Completed</CardTitle>
               <div className="space-y-3">
                 {completedTasks.map((task) => (
-                  <TaskCard key={task.id} task={task} />
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onMove={(status) => handleMove(task.id, status)}
+                  />
                 ))}
               </div>
             </PageSection>
