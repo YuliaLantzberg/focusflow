@@ -31,6 +31,7 @@ export default function ProjectDetailPage() {
   }, [projectId]);
 
   const handleMove = async (taskId: string, status: TaskStatus) => {
+    console.log(status);
     try {
       const updated = await moveTask(taskId, status);
       setTasks((prev) =>
