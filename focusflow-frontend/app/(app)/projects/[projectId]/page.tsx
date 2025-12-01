@@ -27,6 +27,7 @@ export default function ProjectDetailPage() {
   const [newDescription, setNewDescription] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [titleError, setTitleError] = useState<string | null>(null);
+  const [movingTaskId, setMovingTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     loadData<Project>(`http://localhost:3000/projects/${projectId}`)
@@ -39,6 +40,7 @@ export default function ProjectDetailPage() {
   }, [projectId]);
 
   const handleMove = async (taskId: string, status: TaskStatus) => {
+    setMovingTaskId(taskId);
     try {
       const updated = await moveTask(taskId, status);
       setTasks((prev) =>
@@ -46,6 +48,8 @@ export default function ProjectDetailPage() {
       );
     } catch (err) {
       console.error("Failed to move task", err);
+    } finally {
+      setMovingTaskId(null);
     }
   };
 
@@ -124,6 +128,7 @@ export default function ProjectDetailPage() {
                     key={task.id}
                     task={task}
                     onMove={(status) => handleMove(task.id, status)}
+                    isMoving={movingTaskId === task.id}
                   />
                 ))}
               </div>
@@ -137,6 +142,7 @@ export default function ProjectDetailPage() {
                     key={task.id}
                     task={task}
                     onMove={(status) => handleMove(task.id, status)}
+                    isMoving={movingTaskId === task.id}
                   />
                 ))}
               </div>
@@ -150,6 +156,7 @@ export default function ProjectDetailPage() {
                     key={task.id}
                     task={task}
                     onMove={(status) => handleMove(task.id, status)}
+                    isMoving={movingTaskId === task.id}
                   />
                 ))}
               </div>
@@ -163,6 +170,7 @@ export default function ProjectDetailPage() {
                     key={task.id}
                     task={task}
                     onMove={(status) => handleMove(task.id, status)}
+                    isMoving={movingTaskId === task.id}
                   />
                 ))}
               </div>

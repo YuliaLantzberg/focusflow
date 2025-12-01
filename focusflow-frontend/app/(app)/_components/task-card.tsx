@@ -3,11 +3,13 @@ import { Task, TaskStatus } from "@/app/types/task";
 type TaskCardProps = {
   task: Task;
   className?: string;
+  isMoving?: boolean;
   onMove?: (status: TaskStatus) => void | Promise<void>;
 };
 type TaskDropdownMenuProps = {
   status: TaskStatus;
   onMove?: (status: TaskStatus) => void | Promise<void>;
+  isMoving?: boolean;
 };
 
 type TaskStatusOptionsProps = {
@@ -30,16 +32,16 @@ function TaskStatusOptions({ currentStatus }: TaskStatusOptionsProps) {
   );
 }
 
-function TaskDropdownMenu({ status, onMove }: TaskDropdownMenuProps) {
+function TaskDropdownMenu({ status, onMove, isMoving }: TaskDropdownMenuProps) {
   return (
     <select
       className="text-xs bg-transparent text-indigo-300"
       defaultValue=""
       onChange={(e) => {
         const value = e.target.value as TaskStatus;
-        console.log("Dropdown change:", { value, statusBefore: status });
         if (onMove) onMove(value);
       }}
+      disabled={isMoving}
     >
       <option value="" disabled>
         Move to →
@@ -49,7 +51,12 @@ function TaskDropdownMenu({ status, onMove }: TaskDropdownMenuProps) {
   );
 }
 
-export default function TaskCard({ task, className, onMove }: TaskCardProps) {
+export default function TaskCard({
+  task,
+  className,
+  onMove,
+  isMoving,
+}: TaskCardProps) {
   return (
     <div
       className={`${className} flex flex-col gap-2 px-4 py-3 md:px-6 md:py-4 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 transition`}
@@ -58,7 +65,11 @@ export default function TaskCard({ task, className, onMove }: TaskCardProps) {
       {task.description && (
         <p className="text-xs text-gray-400">{task.description}</p>
       )}
-      <TaskDropdownMenu status={task.status} onMove={onMove} />
+      <TaskDropdownMenu
+        status={task.status}
+        onMove={onMove}
+        isMoving={isMoving}
+      />
     </div>
   );
 }
