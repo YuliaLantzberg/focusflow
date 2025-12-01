@@ -52,15 +52,20 @@ export default function ProjectDetailPage() {
     e.preventDefault();
     if (!newTitle.trim()) return;
     setIsCreating(true);
-    const newTask = await createTask(projectId, {
-      title: newTitle,
-      description: newDescription,
-    });
-    console.log(newTask);
-    if (newTask) {
-      setTasks((prev) => [...prev, newTask]);
-      setNewTitle("");
-      setNewDescription("");
+    try {
+      const newTask = await createTask(projectId, {
+        title: newTitle,
+        description: newDescription,
+      });
+      if (newTask) {
+        setTasks((prev) => [...prev, newTask]);
+        setNewTitle("");
+        setNewDescription("");
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -75,7 +80,6 @@ export default function ProjectDetailPage() {
   const inProgressTasks = tasks.filter((t) => t.status === "IN_PROGRESS");
   const blockedTasks = tasks.filter((t) => t.status === "BLOCKED");
   const completedTasks = tasks.filter((t) => t.status === "DONE");
-
   return (
     <PageContainer>
       <div className="flex items-center justify-between mb-6">
@@ -178,7 +182,7 @@ export default function ProjectDetailPage() {
                 className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
               />
             </FormField>
-            <SubmitButton>Create New Task</SubmitButton>
+            <SubmitButton disabled={isCreating}>Create New Task</SubmitButton>
           </FormCard>
         </div>
 
