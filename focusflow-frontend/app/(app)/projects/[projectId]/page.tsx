@@ -28,6 +28,7 @@ export default function ProjectDetailPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [titleError, setTitleError] = useState<string | null>(null);
   const [movingTaskId, setMovingTaskId] = useState<string | null>(null);
+  const [showCreateTaskForm, setShowCreateTaskForm] = useState(false);
 
   useEffect(() => {
     loadData<Project>(`http://localhost:3000/projects/${projectId}`)
@@ -115,10 +116,45 @@ export default function ProjectDetailPage() {
         </div>
         {/* Tasks section */}
         <div className="rounded-lg border border-white/5 bg-white/5 px-4 py-3 md:px-6 md:py-4 space-y-2">
-          <h2 className="text-lg font-medium text-gray-100">Tasks</h2>
-
-          <h3>Total tasks: {tasks.length}</h3>
-
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-medium text-gray-100">Tasks</h2>
+            <button
+              type="button"
+              onClick={() => setShowCreateTaskForm((prev) => !prev)}
+              className="text-xs px-3 py-2 rounded-lg bg-sky-600/50 text-white hover:bg-sky-500/50 transition"
+            >
+              {showCreateTaskForm ? "Hide form" : "New Task"}
+            </button>
+          </div>
+          {showCreateTaskForm && (
+            <FormCard handleSubmit={handleCreateTask}>
+              <FormField label="Title">
+                <input
+                  type="text"
+                  value={newTitle}
+                  onChange={(e) => {
+                    setNewTitle(e.target.value);
+                    if (titleError) setTitleError(null);
+                  }}
+                  placeholder="Name the new task here"
+                  className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
+                />
+                {titleError && (
+                  <p className="mt-1 text-xs text-red-400">{titleError}</p>
+                )}
+              </FormField>
+              <FormField label="Description">
+                <input
+                  type="text"
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  placeholder="Decribe the new task"
+                  className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
+                />
+              </FormField>
+              <SubmitButton disabled={isCreating}>Create New Task</SubmitButton>
+            </FormCard>
+          )}
           <div className="grid gap-4 lg:grid-cols-4">
             <PageSection>
               <CardTitle color="text-cyan-500/50">TODO</CardTitle>
@@ -176,33 +212,6 @@ export default function ProjectDetailPage() {
               </div>
             </PageSection>
           </div>
-          <FormCard handleSubmit={handleCreateTask}>
-            <FormField label="Title">
-              <input
-                type="text"
-                value={newTitle}
-                onChange={(e) => {
-                  setNewTitle(e.target.value);
-                  if (titleError) setTitleError(null);
-                }}
-                placeholder="Name the new task here"
-                className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
-              />
-              {titleError && (
-                <p className="mt-1 text-xs text-red-400">{titleError}</p>
-              )}
-            </FormField>
-            <FormField label="Description">
-              <input
-                type="text"
-                value={newDescription}
-                onChange={(e) => setNewDescription(e.target.value)}
-                placeholder="Decribe the new task"
-                className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
-              />
-            </FormField>
-            <SubmitButton disabled={isCreating}>Create New Task</SubmitButton>
-          </FormCard>
         </div>
 
         {/* Notes section */}
