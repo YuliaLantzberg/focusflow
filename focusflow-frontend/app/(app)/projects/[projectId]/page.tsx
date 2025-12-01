@@ -159,6 +159,9 @@ export default function ProjectDetailPage() {
             <PageSection>
               <CardTitle color="text-cyan-500/50">TODO</CardTitle>
               <div className="space-y-3">
+                {todoTasks.length === 0 && (
+                  <p className="text-xs text-gray-500 italic">No tasks</p>
+                )}
                 {todoTasks.map((task) => (
                   <TaskCard
                     key={task.id}
@@ -173,6 +176,11 @@ export default function ProjectDetailPage() {
             <PageSection>
               <CardTitle color="text-yellow-500/50">In Progress</CardTitle>
               <div className="space-y-3">
+                {inProgressTasks.length === 0 && (
+                  <p className="text-xs text-gray-500 italic">
+                    No tasks in progress
+                  </p>
+                )}
                 {inProgressTasks.map((task) => (
                   <TaskCard
                     key={task.id}
@@ -187,6 +195,11 @@ export default function ProjectDetailPage() {
             <PageSection>
               <CardTitle color="text-zinc-500/50">Blocked</CardTitle>
               <div className="space-y-3">
+                {blockedTasks.length === 0 && (
+                  <p className="text-xs text-gray-500 italic">
+                    No tasks blocked
+                  </p>
+                )}
                 {blockedTasks.map((task) => (
                   <TaskCard
                     key={task.id}
@@ -201,6 +214,11 @@ export default function ProjectDetailPage() {
             <PageSection>
               <CardTitle color="text-emerald-500/50">Completed</CardTitle>
               <div className="space-y-3">
+                {completedTasks.length === 0 && (
+                  <p className="text-xs text-gray-500 italic">
+                    No completed tasks
+                  </p>
+                )}
                 {completedTasks.map((task) => (
                   <TaskCard
                     key={task.id}
