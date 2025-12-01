@@ -26,6 +26,7 @@ export default function ProjectDetailPage() {
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [titleError, setTitleError] = useState<string | null>(null);
 
   useEffect(() => {
     loadData<Project>(`http://localhost:3000/projects/${projectId}`)
@@ -50,7 +51,11 @@ export default function ProjectDetailPage() {
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim()) return;
+    setTitleError(null);
+    if (!newTitle.trim()) {
+      setTitleError("Task title is required");
+      return;
+    }
     setIsCreating(true);
     try {
       const newTask = await createTask(projectId, {
@@ -168,10 +173,16 @@ export default function ProjectDetailPage() {
               <input
                 type="text"
                 value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
+                onChange={(e) => {
+                  setNewTitle(e.target.value);
+                  if (titleError) setTitleError(null);
+                }}
                 placeholder="Name the new task here"
                 className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
               />
+              {titleError && (
+                <p className="mt-1 text-xs text-red-400">{titleError}</p>
+              )}
             </FormField>
             <FormField label="Description">
               <input
