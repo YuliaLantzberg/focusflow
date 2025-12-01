@@ -3,8 +3,9 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 
 import PageContainer from "../../_components/page-container";
-import { loadData, moveTask } from "@/app/lib/apiClient";
+import { loadData } from "@/app/lib/apiClient";
 import { getProjectStatusColor } from "@/app/lib/statusColor";
+import { createTask, moveTask } from "@/app/lib/tasks";
 
 import { Project } from "@/app/types/project";
 import { Task, TaskStatus } from "@/app/types/task";
@@ -14,11 +15,17 @@ import Badge from "../../_components/badge";
 import PageSection from "../../_components/page-section";
 import TaskCard from "../../_components/task-card";
 import { CardTitle } from "../../_components/card-title";
+import FormCard from "../../_components/forms/form-card";
+import { FormField } from "../../_components/forms/form-field";
+import SubmitButton from "../../_components/buttons/submit-button";
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [newTitle, setNewTitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     loadData<Project>(`http://localhost:3000/projects/${projectId}`)
@@ -31,7 +38,6 @@ export default function ProjectDetailPage() {
   }, [projectId]);
 
   const handleMove = async (taskId: string, status: TaskStatus) => {
-    console.log(status);
     try {
       const updated = await moveTask(taskId, status);
       setTasks((prev) =>
@@ -39,6 +45,22 @@ export default function ProjectDetailPage() {
       );
     } catch (err) {
       console.error("Failed to move task", err);
+    }
+  };
+
+  const handleCreateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTitle.trim()) return;
+    setIsCreating(true);
+    const newTask = await createTask(projectId, {
+      title: newTitle,
+      description: newDescription,
+    });
+    console.log(newTask);
+    if (newTask) {
+      setTasks((prev) => [...prev, newTask]);
+      setNewTitle("");
+      setNewDescription("");
     }
   };
 
@@ -81,7 +103,9 @@ export default function ProjectDetailPage() {
         {/* Tasks section */}
         <div className="rounded-lg border border-white/5 bg-white/5 px-4 py-3 md:px-6 md:py-4 space-y-2">
           <h2 className="text-lg font-medium text-gray-100">Tasks</h2>
+
           <h3>Total tasks: {tasks.length}</h3>
+
           <div className="grid gap-4 lg:grid-cols-4">
             <PageSection>
               <CardTitle color="text-cyan-500/50">TODO</CardTitle>
@@ -135,6 +159,27 @@ export default function ProjectDetailPage() {
               </div>
             </PageSection>
           </div>
+          <FormCard handleSubmit={handleCreateTask}>
+            <FormField label="Title">
+              <input
+                type="text"
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                placeholder="Name the new task here"
+                className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
+              />
+            </FormField>
+            <FormField label="Description">
+              <input
+                type="text"
+                value={newDescription}
+                onChange={(e) => setNewDescription(e.target.value)}
+                placeholder="Decribe the new task"
+                className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
+              />
+            </FormField>
+            <SubmitButton>Create New Task</SubmitButton>
+          </FormCard>
         </div>
 
         {/* Notes section */}

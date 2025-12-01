@@ -1,5 +1,3 @@
-import { Task, TaskStatus } from "../types/task";
-
 export function getToken() {
   const token = localStorage.getItem("ff_token");
   if (!token) return null;
@@ -27,20 +25,6 @@ export async function loadData<T>(
   const res = await apiFetch(url, options);
   if (!res.ok) {
     throw new Error(`Failed fetching ${url}: ${res.status}`);
-  }
-  return res.json();
-}
-
-export async function moveTask(
-  taskId: string,
-  status: TaskStatus
-): Promise<Task> {
-  const res = await apiFetch(`http://localhost:3000/tasks/${taskId}/move`, {
-    method: "PATCH",
-    body: JSON.stringify({ status }),
-  });
-  if (!res.ok) {
-    throw new Error(`Failed move task ${taskId}: ${res.status}`);
   }
   return res.json();
 }

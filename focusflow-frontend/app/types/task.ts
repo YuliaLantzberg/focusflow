@@ -12,3 +12,9 @@ export interface Task {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export type CreateTaskPayload = {
+  title: string;
+  description?: string;
+  dueDate?: string;
+};
