@@ -5,6 +5,7 @@ type TaskCardProps = {
   className?: string;
   isMoving?: boolean;
   onMove?: (status: TaskStatus) => void | Promise<void>;
+  onSelect?: (task: Task) => void;
 };
 type TaskDropdownMenuProps = {
   status: TaskStatus;
@@ -56,10 +57,12 @@ export default function TaskCard({
   className,
   onMove,
   isMoving,
+  onSelect,
 }: TaskCardProps) {
   return (
     <div
-      className={`${className} flex flex-col gap-2 px-4 py-3 md:px-6 md:py-4 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 transition`}
+      className={`${className} flex flex-col gap-2 px-4 py-3 md:px-6 md:py-4 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 transition cursor-pointer`}
+      onClick={() => onSelect?.(task)}
     >
       <p className="font-medium">{task.title}</p>
       {task.description && (

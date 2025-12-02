@@ -2,6 +2,7 @@ import { Task, TaskStatus } from "@/app/types/task";
 import PageSection from "../../_components/page-section";
 import { CardTitle } from "../../_components/card-title";
 import TaskCard from "../../tasks/_components/task-card";
+import Link from "next/link";
 
 type KanbanColumnProps = {
   title: string;
@@ -9,6 +10,7 @@ type KanbanColumnProps = {
   tasks: Task[];
   movingTaskId: string | null;
   onMove: (taskId: string, status: TaskStatus) => void | Promise<void>;
+  onSelect?: (task: Task) => void;
 };
 
 export default function KanbanColumn({
@@ -17,6 +19,7 @@ export default function KanbanColumn({
   tasks,
   movingTaskId,
   onMove,
+  onSelect,
 }: KanbanColumnProps) {
   return (
     <PageSection>
@@ -31,6 +34,7 @@ export default function KanbanColumn({
             task={task}
             onMove={(status) => onMove(task.id, status)}
             isMoving={movingTaskId === task.id}
+            onSelect={onSelect}
           />
         ))}
       </div>

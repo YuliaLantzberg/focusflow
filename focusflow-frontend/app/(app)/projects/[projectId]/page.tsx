@@ -16,6 +16,7 @@ import FormCard from "../../_components/forms/form-card";
 import { FormField } from "../../_components/forms/form-field";
 import SubmitButton from "../../_components/buttons/submit-button";
 import KanbanColumn from "../_components/kanban-column";
+import { TaskDetails } from "../../tasks/_components/task-details-panel";
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -27,6 +28,7 @@ export default function ProjectDetailPage() {
   const [titleError, setTitleError] = useState<string | null>(null);
   const [movingTaskId, setMovingTaskId] = useState<string | null>(null);
   const [showCreateTaskForm, setShowCreateTaskForm] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   useEffect(() => {
     loadData<Project>(`http://localhost:3000/projects/${projectId}`)
@@ -50,6 +52,12 @@ export default function ProjectDetailPage() {
     } finally {
       setMovingTaskId(null);
     }
+  };
+
+  const handleSelectTask = (task: Task | null) => {
+    console.log(task);
+    if (selectedTask) setSelectedTask(null);
+    else setSelectedTask(task);
   };
 
   const handleCreateTask = async (e: React.FormEvent) => {
@@ -123,6 +131,12 @@ export default function ProjectDetailPage() {
             >
               {showCreateTaskForm ? "Hide form" : "New Task"}
             </button>
+            {selectedTask && (
+              <TaskDetails
+                task={selectedTask}
+                onClose={() => handleSelectTask(null)}
+              />
+            )}
           </div>
           {showCreateTaskForm && (
             <FormCard handleSubmit={handleCreateTask}>
@@ -160,6 +174,7 @@ export default function ProjectDetailPage() {
               tasks={todoTasks}
               onMove={handleMove}
               movingTaskId={movingTaskId}
+              onSelect={handleSelectTask}
             />
             <KanbanColumn
               title="In Progress"
@@ -167,6 +182,7 @@ export default function ProjectDetailPage() {
               tasks={inProgressTasks}
               onMove={handleMove}
               movingTaskId={movingTaskId}
+              onSelect={handleSelectTask}
             />
             <KanbanColumn
               title="Blocked"
@@ -174,6 +190,7 @@ export default function ProjectDetailPage() {
               tasks={blockedTasks}
               onMove={handleMove}
               movingTaskId={movingTaskId}
+              onSelect={handleSelectTask}
             />
             <KanbanColumn
               title="Completed"
@@ -181,6 +198,7 @@ export default function ProjectDetailPage() {
               tasks={completedTasks}
               onMove={handleMove}
               movingTaskId={movingTaskId}
+              onSelect={handleSelectTask}
             />
           </div>
         </div>

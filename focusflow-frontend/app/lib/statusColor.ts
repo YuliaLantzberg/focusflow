@@ -9,3 +9,14 @@ export function getProjectStatusColor(status: string): string {
   if (!statusColor[status]) return "bg-gray-400";
   return statusColor[status];
 }
+
+export function getTaskStatusColor(status: string): string {
+  const statusColor: Record<string, string> = {
+    TODO: "bg-cyan-500/50",
+    IN_PROGRESS: "bg-yellow-500/50",
+    BLOCKED: "bg-zinc-500/50",
+    DONE: "bg-emerald-500/50",
+  };
+  if (!statusColor[status]) return "bg-gray-400";
+  return statusColor[status];
+}
