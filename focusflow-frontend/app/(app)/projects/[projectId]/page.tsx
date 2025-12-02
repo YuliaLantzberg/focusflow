@@ -12,12 +12,10 @@ import { Task, TaskStatus } from "@/app/types/task";
 
 import { PageTitle } from "../../_components/page-title";
 import Badge from "../../_components/badge";
-import PageSection from "../../_components/page-section";
-import TaskCard from "../../_components/task-card";
-import { CardTitle } from "../../_components/card-title";
 import FormCard from "../../_components/forms/form-card";
 import { FormField } from "../../_components/forms/form-field";
 import SubmitButton from "../../_components/buttons/submit-button";
+import KanbanColumn from "../_components/kanban-column";
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -156,79 +154,34 @@ export default function ProjectDetailPage() {
             </FormCard>
           )}
           <div className="grid gap-4 lg:grid-cols-4">
-            <PageSection>
-              <CardTitle color="text-cyan-500/50">TODO</CardTitle>
-              <div className="space-y-3">
-                {todoTasks.length === 0 && (
-                  <p className="text-xs text-gray-500 italic">No tasks</p>
-                )}
-                {todoTasks.map((task) => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    onMove={(status) => handleMove(task.id, status)}
-                    isMoving={movingTaskId === task.id}
-                  />
-                ))}
-              </div>
-            </PageSection>
-
-            <PageSection>
-              <CardTitle color="text-yellow-500/50">In Progress</CardTitle>
-              <div className="space-y-3">
-                {inProgressTasks.length === 0 && (
-                  <p className="text-xs text-gray-500 italic">
-                    No tasks in progress
-                  </p>
-                )}
-                {inProgressTasks.map((task) => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    onMove={(status) => handleMove(task.id, status)}
-                    isMoving={movingTaskId === task.id}
-                  />
-                ))}
-              </div>
-            </PageSection>
-
-            <PageSection>
-              <CardTitle color="text-zinc-500/50">Blocked</CardTitle>
-              <div className="space-y-3">
-                {blockedTasks.length === 0 && (
-                  <p className="text-xs text-gray-500 italic">
-                    No tasks blocked
-                  </p>
-                )}
-                {blockedTasks.map((task) => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    onMove={(status) => handleMove(task.id, status)}
-                    isMoving={movingTaskId === task.id}
-                  />
-                ))}
-              </div>
-            </PageSection>
-
-            <PageSection>
-              <CardTitle color="text-emerald-500/50">Completed</CardTitle>
-              <div className="space-y-3">
-                {completedTasks.length === 0 && (
-                  <p className="text-xs text-gray-500 italic">
-                    No completed tasks
-                  </p>
-                )}
-                {completedTasks.map((task) => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    onMove={(status) => handleMove(task.id, status)}
-                    isMoving={movingTaskId === task.id}
-                  />
-                ))}
-              </div>
-            </PageSection>
+            <KanbanColumn
+              title="TODO"
+              titleColor="text-cyan-500/50"
+              tasks={todoTasks}
+              onMove={handleMove}
+              movingTaskId={movingTaskId}
+            />
+            <KanbanColumn
+              title="In Progress"
+              titleColor="text-yellow-500/50"
+              tasks={inProgressTasks}
+              onMove={handleMove}
+              movingTaskId={movingTaskId}
+            />
+            <KanbanColumn
+              title="Blocked"
+              titleColor="text-zinc-500/50"
+              tasks={blockedTasks}
+              onMove={handleMove}
+              movingTaskId={movingTaskId}
+            />
+            <KanbanColumn
+              title="Completed"
+              titleColor="text-emerald-500/50"
+              tasks={completedTasks}
+              onMove={handleMove}
+              movingTaskId={movingTaskId}
+            />
           </div>
         </div>
 
