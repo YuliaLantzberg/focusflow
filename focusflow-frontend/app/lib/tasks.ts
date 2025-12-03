@@ -31,3 +31,19 @@ export async function createTask(
   }
   return res.json();
 }
+
+export async function updateTask(
+  taskId: string,
+  payload: Partial<Task>
+): Promise<Task> {
+  const res = await apiFetch(`http://localhost:3000/tasks/${taskId}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to update task ${taskId}: ${res.status}`);
+  }
+
+  return res.json();
+}

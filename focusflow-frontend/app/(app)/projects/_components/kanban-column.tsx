@@ -2,7 +2,6 @@ import { Task, TaskStatus } from "@/app/types/task";
 import PageSection from "../../_components/page-section";
 import { CardTitle } from "../../_components/card-title";
 import TaskCard from "../../tasks/_components/task-card";
-import Link from "next/link";
 
 type KanbanColumnProps = {
   title: string;
@@ -11,6 +10,7 @@ type KanbanColumnProps = {
   movingTaskId: string | null;
   onMove: (taskId: string, status: TaskStatus) => void | Promise<void>;
   onSelect?: (task: Task) => void;
+  onUpdate?: (updated: Task) => void;
 };
 
 export default function KanbanColumn({

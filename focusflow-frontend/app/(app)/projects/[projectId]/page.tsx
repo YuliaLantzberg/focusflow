@@ -85,6 +85,13 @@ export default function ProjectDetailPage() {
     }
   };
 
+  const handleTaskUpdate = (updated: Task) => {
+    setTasks((prev) =>
+      prev.map((task) => (task.id === updated.id ? updated : task))
+    );
+    setSelectedTask(updated);
+  };
+
   if (!project)
     return (
       <PageContainer>
@@ -135,6 +142,7 @@ export default function ProjectDetailPage() {
               <TaskDetails
                 task={selectedTask}
                 onClose={() => handleSelectTask(null)}
+                onUpdate={handleTaskUpdate}
               />
             )}
           </div>
