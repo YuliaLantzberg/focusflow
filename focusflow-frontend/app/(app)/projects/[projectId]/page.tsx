@@ -92,6 +92,10 @@ export default function ProjectDetailPage() {
     setSelectedTask(updated);
   };
 
+  const handleTaskDelete = (deletedId: string) => {
+    setTasks((prev) => prev.filter((task) => task.id !== deletedId));
+  };
+
   if (!project)
     return (
       <PageContainer>
@@ -143,6 +147,7 @@ export default function ProjectDetailPage() {
                 task={selectedTask}
                 onClose={() => handleSelectTask(null)}
                 onUpdate={handleTaskUpdate}
+                onDelete={handleTaskDelete}
               />
             )}
           </div>

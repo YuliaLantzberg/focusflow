@@ -4,7 +4,7 @@ import { getTaskStatusColor } from "@/app/lib/statusColor";
 import { formatDate } from "@/app/lib/helper";
 import Badge from "../../_components/badge";
 import { PageTitle } from "../../_components/page-title";
-import { updateTask } from "@/app/lib/tasks";
+import { deleteTask, updateTask } from "@/app/lib/tasks";
 import FormCard from "../../_components/forms/form-card";
 import { FormField } from "../../_components/forms/form-field";
 import SubmitButton from "../../_components/buttons/submit-button";
@@ -13,9 +13,15 @@ type TaskDetailsPanel = {
   task: Task;
   onClose: () => void;
   onUpdate?: (updated: Task) => void;
+  onDelete?: (deletedId: string) => void;
 };
 
-export function TaskDetails({ task, onClose, onUpdate }: TaskDetailsPanel) {
+export function TaskDetails({
+  task,
+  onClose,
+  onUpdate,
+  onDelete,
+}: TaskDetailsPanel) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [editDescription, setEditDescription] = useState(
@@ -41,6 +47,20 @@ export function TaskDetails({ task, onClose, onUpdate }: TaskDetailsPanel) {
       // later we can add error UI
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async (deletedId: string) => {
+    setIsSaving(true);
+    try {
+      await deleteTask(deletedId);
+      onDelete?.(deletedId);
+    } catch (err) {
+      console.error("Failed to update task", err);
+      // later we can add error UI
+    } finally {
+      setIsSaving(false);
+      onClose();
     }
   };
 
@@ -80,6 +100,15 @@ export function TaskDetails({ task, onClose, onUpdate }: TaskDetailsPanel) {
                   onChange={(e) => setEditDescription(e.target.value)}
                   placeholder={task.description}
                   className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700 min-h-32 resize-none"
+                />
+              </FormField>
+              <FormField label="Due Date">
+                <input
+                  type="datetime-local"
+                  value={editDescription}
+                  onChange={(e) => setEditDueDate(e.target.value)}
+                  placeholder={task.dueDate}
+                  className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700 "
                 />
               </FormField>
               <SubmitButton disabled={isSaving}>
@@ -151,6 +180,13 @@ export function TaskDetails({ task, onClose, onUpdate }: TaskDetailsPanel) {
               onClick={() => setIsEditing(true)}
             >
               Edit task
+            </button>
+            <button
+              type="button"
+              className="text-sm text-red-300 hover:underline cursor-pointer"
+              onClick={() => handleDelete(task.id)}
+            >
+              Delete task
             </button>
           </div>
         </div>
