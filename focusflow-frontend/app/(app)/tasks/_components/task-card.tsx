@@ -1,4 +1,5 @@
-import { Task, TaskStatus } from "@/app/types/task";
+import { Task, TASK_STATUSES, TaskStatus } from "@/app/types/task";
+import { CardShell } from "../../_components/card/cardShell";
 
 type TaskCardProps = {
   task: Task;
@@ -18,9 +19,8 @@ type TaskStatusOptionsProps = {
 };
 
 function TaskStatusOptions({ currentStatus }: TaskStatusOptionsProps) {
-  const statuses: TaskStatus[] = ["TODO", "IN_PROGRESS", "BLOCKED", "DONE"];
-  const filteredStatuses = statuses.filter(
-    (status: string) => status !== currentStatus
+  const filteredStatuses = TASK_STATUSES.filter(
+    (status) => status !== currentStatus
   );
   return (
     <>
@@ -36,8 +36,9 @@ function TaskStatusOptions({ currentStatus }: TaskStatusOptionsProps) {
 function TaskDropdownMenu({ status, onMove, isMoving }: TaskDropdownMenuProps) {
   return (
     <select
-      className="text-xs bg-transparent text-indigo-300"
+      className="text-xs bg-transparent text-indigo-300 cursor-default"
       defaultValue=""
+      onClick={(e) => e.stopPropagation()}
       onChange={(e) => {
         const value = e.target.value as TaskStatus;
         if (onMove) onMove(value);
@@ -60,19 +61,21 @@ export default function TaskCard({
   onSelect,
 }: TaskCardProps) {
   return (
-    <div
-      className={`${className} flex flex-col gap-2 px-4 py-3 md:px-6 md:py-4 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 transition cursor-pointer`}
-      onClick={() => onSelect?.(task)}
+    <CardShell
+      className={`${className} flex flex-col gap-2 px-4 py-3 md:px-6 md:py-4`}
     >
-      <p className="font-medium">{task.title}</p>
-      {task.description && (
-        <p className="text-xs text-gray-400">{task.description}</p>
-      )}
+      <div className="cursor-pointer" onClick={() => onSelect?.(task)}>
+        <p className="font-medium">{task.title}</p>
+        {task.description && (
+          <p className="text-xs text-gray-400">{task.description}</p>
+        )}
+      </div>
+
       <TaskDropdownMenu
         status={task.status}
         onMove={onMove}
         isMoving={isMoving}
       />
-    </div>
+    </CardShell>
   );
 }

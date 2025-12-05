@@ -8,7 +8,7 @@ import { getProjectStatusColor } from "@/app/lib/statusColor";
 import { createTask, moveTask } from "@/app/lib/tasks";
 
 import { Project } from "@/app/types/project";
-import { Task, TaskStatus } from "@/app/types/task";
+import { PROJECT_TASK_COLUMNS, Task, TaskStatus } from "@/app/types/task";
 
 import { PageTitle } from "../../_components/page-title";
 import Badge from "../../_components/badge";
@@ -17,6 +17,9 @@ import { FormField } from "../../_components/forms/form-field";
 import SubmitButton from "../../_components/buttons/submit-button";
 import KanbanColumn from "../_components/kanban-column";
 import { TaskDetails } from "../../tasks/_components/task-details-panel";
+import { CardShell } from "../../_components/card/cardShell";
+import { CreateNewButton } from "../../_components/buttons/create-new-button";
+import { CardTitle } from "../../_components/card/card-title";
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -55,9 +58,7 @@ export default function ProjectDetailPage() {
   };
 
   const handleSelectTask = (task: Task | null) => {
-    console.log(task);
-    if (selectedTask) setSelectedTask(null);
-    else setSelectedTask(task);
+    setSelectedTask(task);
   };
 
   const handleCreateTask = async (e: React.FormEvent) => {
@@ -103,10 +104,6 @@ export default function ProjectDetailPage() {
       </PageContainer>
     );
 
-  const todoTasks = tasks.filter((t) => t.status === "TODO");
-  const inProgressTasks = tasks.filter((t) => t.status === "IN_PROGRESS");
-  const blockedTasks = tasks.filter((t) => t.status === "BLOCKED");
-  const completedTasks = tasks.filter((t) => t.status === "DONE");
   return (
     <PageContainer>
       <div className="flex items-center justify-between mb-6">
@@ -119,7 +116,7 @@ export default function ProjectDetailPage() {
         />
       </div>
       <div className="space-y-4">
-        <div className="rounded-lg border border-white/5 bg-white/5 px-4 py-3 md:px-6 md:py-4 space-y-3">
+        <CardShell className="px-4 py-3 md:px-6 md:py-4 space-y-3">
           {project.description && (
             <p className="text-gray-300">{project.description}</p>
           )}
@@ -130,26 +127,16 @@ export default function ProjectDetailPage() {
               {project.dueDate && <p>Due date: {project.dueDate}</p>}
             </div>
           )}
-        </div>
+        </CardShell>
         {/* Tasks section */}
-        <div className="rounded-lg border border-white/5 bg-white/5 px-4 py-3 md:px-6 md:py-4 space-y-2">
+        <CardShell className="px-4 py-3 md:px-6 md:py-4 space-y-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium text-gray-100">Tasks</h2>
-            <button
-              type="button"
+            <CardTitle color="text-white">Tasks</CardTitle>
+            <CreateNewButton
               onClick={() => setShowCreateTaskForm((prev) => !prev)}
-              className="text-xs px-3 py-2 rounded-lg bg-sky-600/50 text-white hover:bg-sky-500/50 transition"
             >
               {showCreateTaskForm ? "Hide form" : "New Task"}
-            </button>
-            {selectedTask && (
-              <TaskDetails
-                task={selectedTask}
-                onClose={() => handleSelectTask(null)}
-                onUpdate={handleTaskUpdate}
-                onDelete={handleTaskDelete}
-              />
-            )}
+            </CreateNewButton>
           </div>
           {showCreateTaskForm && (
             <FormCard handleSubmit={handleCreateTask}>
@@ -180,48 +167,38 @@ export default function ProjectDetailPage() {
               <SubmitButton disabled={isCreating}>Create New Task</SubmitButton>
             </FormCard>
           )}
+
           <div className="grid gap-4 lg:grid-cols-4">
-            <KanbanColumn
-              title="TODO"
-              titleColor="text-cyan-500/50"
-              tasks={todoTasks}
-              onMove={handleMove}
-              movingTaskId={movingTaskId}
-              onSelect={handleSelectTask}
-            />
-            <KanbanColumn
-              title="In Progress"
-              titleColor="text-yellow-500/50"
-              tasks={inProgressTasks}
-              onMove={handleMove}
-              movingTaskId={movingTaskId}
-              onSelect={handleSelectTask}
-            />
-            <KanbanColumn
-              title="Blocked"
-              titleColor="text-zinc-500/50"
-              tasks={blockedTasks}
-              onMove={handleMove}
-              movingTaskId={movingTaskId}
-              onSelect={handleSelectTask}
-            />
-            <KanbanColumn
-              title="Completed"
-              titleColor="text-emerald-500/50"
-              tasks={completedTasks}
-              onMove={handleMove}
-              movingTaskId={movingTaskId}
-              onSelect={handleSelectTask}
-            />
+            {PROJECT_TASK_COLUMNS.map((column) => (
+              <KanbanColumn
+                key={column.status}
+                title={column.title}
+                titleColor={column.titleColor}
+                status={column.status}
+                tasks={tasks.filter((t) => t.status === column.status)}
+                onMove={handleMove}
+                movingTaskId={movingTaskId}
+                onSelect={handleSelectTask}
+              />
+            ))}
           </div>
-        </div>
+        </CardShell>
 
         {/* Notes section */}
-        <div className="rounded-lg border border-white/5 bg-white/5 px-4 py-3 md:px-6 md:py-4 space-y-2">
+        <CardShell className="px-4 py-3 md:px-6 md:py-4 space-y-2">
           <h2 className="text-lg font-medium text-gray-100">Notes</h2>
           <p className="text-sm text-gray-400">Notes UI coming soon.</p>
-        </div>
+        </CardShell>
       </div>
+
+      {selectedTask && (
+        <TaskDetails
+          task={selectedTask}
+          onClose={() => setSelectedTask(null)}
+          onUpdate={handleTaskUpdate}
+          onDelete={handleTaskDelete}
+        />
+      )}
     </PageContainer>
   );
 }
