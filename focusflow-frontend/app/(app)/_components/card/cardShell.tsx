@@ -1,3 +1,4 @@
+import { COLORS } from "@/app/lib/styles";
 import React from "react";
 
 type CardShellProps = {
@@ -9,8 +10,8 @@ export function CardShell({ children, className }: CardShellProps) {
   return (
     <div
       className={`
-        rounded-lg border border-white/5 bg-white/5 
-        hover:bg-white/10 transition
+        rounded-lg border ${COLORS.border} ${COLORS.surface}
+        ${COLORS.surfaceHover} transition
         ${className ?? ""}
       `}
     >

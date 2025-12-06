@@ -1,3 +1,4 @@
+import { SIZES } from "@/app/lib/styles";
 import { ReactNode } from "react";
 
 type SubmitButtonProps = {
@@ -13,7 +14,9 @@ export default function SubmitButton({
     <button
       type="submit"
       disabled={disabled}
-      className={`w-full p-4 rounded-xl text-white font-medium  transition-colors ${
+      className={`w-full p-4 ${
+        SIZES.radiusMedium
+      } text-white font-medium  transition-colors ${
         disabled
           ? "bg-sky-600/20 opacity-50"
           : "bg-sky-600/50 hover:bg-sky-500/50 cursor-pointer"

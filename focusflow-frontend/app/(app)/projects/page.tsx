@@ -14,6 +14,7 @@ import Badge from "../_components/badge";
 import { ListItem } from "../_components/list-item";
 import { PageTitle } from "../_components/page-title";
 import { CreateNewButton } from "../_components/buttons/create-new-button";
+import { COLORS } from "@/app/lib/styles";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -47,14 +48,16 @@ export default function ProjectsPage() {
               }
             >
               <div className="flex flex-col items-start gap-2">
-                <h2 className="text-lg font-medium text-gray-100">
+                <h2 className={`text-lg font-medium ${COLORS.textPrimary}`}>
                   {project.name}
                 </h2>
                 {project.description && (
                   <p className="text-gray-300">{project.description}</p>
                 )}
                 {(project.clientCompany || project.dueDate) && (
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+                  <div
+                    className={`flex flex-wrap items-center gap-4 text-sm ${COLORS.textSecondary}`}
+                  >
                     {project.clientCompany && <p>{project.clientCompany}</p>}
                     {project.dueDate && <p>Due Date: {project.dueDate}</p>}
                   </div>

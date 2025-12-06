@@ -8,6 +8,9 @@ import { deleteTask, updateTask } from "@/app/lib/tasks";
 import FormCard from "../../_components/forms/form-card";
 import { FormField } from "../../_components/forms/form-field";
 import SubmitButton from "../../_components/buttons/submit-button";
+import ModalShell from "../../_components/modal-shell";
+import TextBtn from "../../_components/buttons/text-btn";
+import { COLORS, STYLES } from "@/app/lib/styles";
 
 type TaskDetailsPanel = {
   task: Task;
@@ -56,7 +59,7 @@ export function TaskDetails({
       await deleteTask(deletedId);
       onDelete?.(deletedId);
     } catch (err) {
-      console.error("Failed to update task", err);
+      console.error("Failed to delete task", err);
       // later we can add error UI
     } finally {
       setIsSaving(false);
@@ -66,131 +69,92 @@ export function TaskDetails({
 
   if (isEditing) {
     return (
-      <>
-        <div
-          id="modal-overlay"
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
-        />
-        <div
-          id="modal-content"
-          className="fixed inset-0 flex items-center justify-center z-50"
-        >
-          <div className="relative w-full max-w-2xl mx-4 rounded-2xl border border-white/10 bg-slate-900/95 shadow-2xl flex flex-col min-h-[60vh]">
-            {/* Close button */}
-            <button
-              id="close-modal"
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-200 text-4xl leading-none"
-              onClick={onClose}
-            >
-              &times;
-            </button>
-            <FormCard handleSubmit={handleSave}>
-              <FormField label="Task name">
-                <input
-                  type="text"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  placeholder={task.title}
-                  className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
-                />
-              </FormField>
-              <FormField label="Description">
-                <textarea
-                  value={editDescription}
-                  onChange={(e) => setEditDescription(e.target.value)}
-                  placeholder={task.description}
-                  className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700 min-h-32 resize-none"
-                />
-              </FormField>
-              <FormField label="Due Date">
-                <input
-                  type="datetime-local"
-                  value={editDescription}
-                  onChange={(e) => setEditDueDate(e.target.value)}
-                  placeholder={task.dueDate}
-                  className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700 "
-                />
-              </FormField>
-              <SubmitButton disabled={isSaving}>
-                {isSaving ? "Saving..." : "Save changes"}
-              </SubmitButton>
-            </FormCard>
-          </div>
-        </div>
-      </>
+      <ModalShell onClose={onClose}>
+        <FormCard handleSubmit={handleSave}>
+          <FormField label="Task name">
+            <input
+              type="text"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              placeholder={task.title}
+              className={`${STYLES.form.field}`}
+            />
+          </FormField>
+          <FormField label="Description">
+            <textarea
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              placeholder={task.description}
+              className={`${STYLES.form.field} min-h-32 resize-none`}
+            />
+          </FormField>
+          <FormField label="Due Date">
+            <input
+              type="date"
+              value={editDueDate}
+              onChange={(e) => setEditDueDate(e.target.value)}
+              className={`${STYLES.form.field}`}
+            />
+          </FormField>
+          <SubmitButton disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save changes"}
+          </SubmitButton>
+        </FormCard>
+      </ModalShell>
     );
   }
   return (
-    <>
-      <div
-        id="modal-overlay"
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
-      />
-      <div
-        id="modal-content"
-        className="fixed inset-0 flex items-center justify-center z-50"
-      >
-        <div className="relative w-full max-w-2xl mx-4 rounded-2xl border border-white/10 bg-slate-900/95 shadow-2xl flex flex-col min-h-[60vh]">
-          {/* Close button */}
-          <button
-            id="close-modal"
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-200 text-4xl leading-none"
-            onClick={onClose}
-          >
-            &times;
-          </button>
-
-          {/* Body (header + description) */}
-          <div className="flex-1 p-12">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="py-3">
-                <PageTitle>{task.title}</PageTitle>
-                <p className="text-xs text-gray-400 mt-1">Task details</p>
-              </div>
-
-              <Badge
-                label={task.status}
-                colorClass={getTaskStatusColor(task.status)}
-                className="w-28"
-              />
-            </div>
-
-            <div className="space-y-3 mt-14">
-              {task.description && (
-                <p className="text-sm text-gray-200 leading-relaxed">
-                  {task.description}
-                </p>
-              )}
-            </div>
+    <ModalShell onClose={onClose}>
+      <div className="flex-1 p-12">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="py-3">
+            <PageTitle>{task.title}</PageTitle>
+            <p className={`text-xs mt-1 ${COLORS.textSecondary}`}>
+              Task details
+            </p>
           </div>
 
-          {/* Footer (due date) */}
-          <div className="flex justify-between items-center px-12 pb-6 pt-4 border-t border-white/10">
-            {task.dueDate && (
-              <p className="text-xs text-gray-400">
-                Due date:
-                <span className="font-medium text-gray-200 ml-2">
-                  {formatDate(task.dueDate)}
-                </span>
-              </p>
-            )}
-            <button
-              type="button"
-              className="text-sm text-indigo-300 hover:underline cursor-pointer"
-              onClick={() => setIsEditing(true)}
-            >
-              Edit task
-            </button>
-            <button
-              type="button"
-              className="text-sm text-red-300 hover:underline cursor-pointer"
-              onClick={() => handleDelete(task.id)}
-            >
-              Delete task
-            </button>
-          </div>
+          <Badge
+            label={task.status}
+            colorClass={getTaskStatusColor(task.status)}
+            className="w-28"
+          />
+        </div>
+
+        <div className="space-y-3 mt-14">
+          {task.description && (
+            <p className="text-sm text-gray-200 leading-relaxed">
+              {task.description}
+            </p>
+          )}
         </div>
       </div>
-    </>
+
+      {/* Footer (due date) */}
+      <div
+        className={`${STYLES.flexCenter} px-12 pb-6 pt-4 border-t ${COLORS.borderStrong}`}
+      >
+        {task.dueDate && (
+          <p className={`text-xs ${COLORS.textSecondary}`}>
+            Due date:
+            <span className="font-medium text-gray-200 ml-2">
+              {formatDate(task.dueDate)}
+            </span>
+          </p>
+        )}
+        <TextBtn
+          onClick={setIsEditing}
+          data={true}
+          color={COLORS.BtnTextColor.primary}
+          label="Edit task"
+        />
+        <TextBtn
+          onClick={handleDelete}
+          data={task.id}
+          color={COLORS.BtnTextColor.danger}
+          label="Delete task"
+        />
+      </div>
+    </ModalShell>
   );
 }

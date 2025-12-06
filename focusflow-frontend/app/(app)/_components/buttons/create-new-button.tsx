@@ -7,7 +7,7 @@ type CreateNewButtonProps = {
   href?: string;
   onClick?: () => void;
   label?: string;
-  children: ReactNode;
+  children?: ReactNode;
 };
 
 export function CreateNewButton({

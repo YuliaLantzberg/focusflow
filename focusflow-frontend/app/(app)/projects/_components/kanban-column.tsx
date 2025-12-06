@@ -2,6 +2,7 @@ import { Task, TaskStatus } from "@/app/types/task";
 import PageSection from "../../_components/page-section";
 import { CardTitle } from "../../_components/card/card-title";
 import TaskCard from "../../tasks/_components/task-card";
+import { COLORS } from "@/app/lib/styles";
 
 type KanbanColumnProps = {
   title: string;
@@ -28,7 +29,9 @@ export default function KanbanColumn({
         <CardTitle color={titleColor}>{title}</CardTitle>
         <div className={`space-y-3 `}>
           {tasks.length === 0 && (
-            <p className="text-xs text-gray-500 italic">No {title} tasks</p>
+            <p className={`text-xs ${COLORS.textMuted} italic`}>
+              No {title} tasks
+            </p>
           )}
           {tasks.map((task) => (
             <TaskCard

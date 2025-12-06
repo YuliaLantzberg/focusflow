@@ -20,6 +20,7 @@ import { TaskDetails } from "../../tasks/_components/task-details-panel";
 import { CardShell } from "../../_components/card/cardShell";
 import { CreateNewButton } from "../../_components/buttons/create-new-button";
 import { CardTitle } from "../../_components/card/card-title";
+import { COLORS, SIZES, STYLES } from "@/app/lib/styles";
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -106,7 +107,7 @@ export default function ProjectDetailPage() {
 
   return (
     <PageContainer>
-      <div className="flex items-center justify-between mb-6">
+      <div className={`${STYLES.flexCenter} mb-6`}>
         <PageTitle>{project.name}</PageTitle>
 
         <Badge
@@ -116,21 +117,23 @@ export default function ProjectDetailPage() {
         />
       </div>
       <div className="space-y-4">
-        <CardShell className="px-4 py-3 md:px-6 md:py-4 space-y-3">
+        <CardShell className={`${SIZES.cardPadding} space-y-3`}>
           {project.description && (
             <p className="text-gray-300">{project.description}</p>
           )}
 
           {(project.clientCompany || project.dueDate) && (
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+            <div
+              className={`flex flex-wrap items-center gap-4 text-sm ${COLORS.textSecondary}`}
+            >
               {project.clientCompany && <p>Client: {project.clientCompany}</p>}
               {project.dueDate && <p>Due date: {project.dueDate}</p>}
             </div>
           )}
         </CardShell>
         {/* Tasks section */}
-        <CardShell className="px-4 py-3 md:px-6 md:py-4 space-y-2">
-          <div className="flex items-center justify-between">
+        <CardShell className={`${SIZES.cardPadding} space-y-2`}>
+          <div className={STYLES.flexCenter}>
             <CardTitle color="text-white">Tasks</CardTitle>
             <CreateNewButton
               onClick={() => setShowCreateTaskForm((prev) => !prev)}
@@ -149,7 +152,7 @@ export default function ProjectDetailPage() {
                     if (titleError) setTitleError(null);
                   }}
                   placeholder="Name the new task here"
-                  className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
+                  className={STYLES.form.field}
                 />
                 {titleError && (
                   <p className="mt-1 text-xs text-red-400">{titleError}</p>
@@ -161,7 +164,7 @@ export default function ProjectDetailPage() {
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
                   placeholder="Decribe the new task"
-                  className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
+                  className={STYLES.form.field}
                 />
               </FormField>
               <SubmitButton disabled={isCreating}>Create New Task</SubmitButton>
@@ -185,9 +188,11 @@ export default function ProjectDetailPage() {
         </CardShell>
 
         {/* Notes section */}
-        <CardShell className="px-4 py-3 md:px-6 md:py-4 space-y-2">
-          <h2 className="text-lg font-medium text-gray-100">Notes</h2>
-          <p className="text-sm text-gray-400">Notes UI coming soon.</p>
+        <CardShell className={`${SIZES.cardPadding} space-y-2`}>
+          <h2 className={`text-lg font-medium ${COLORS.textPrimary}`}>Notes</h2>
+          <p className={`text-sm ${COLORS.textSecondary}`}>
+            Notes UI coming soon.
+          </p>
         </CardShell>
       </div>
 

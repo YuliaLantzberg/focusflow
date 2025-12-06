@@ -1,5 +1,6 @@
 import { Task, TASK_STATUSES, TaskStatus } from "@/app/types/task";
 import { CardShell } from "../../_components/card/cardShell";
+import { COLORS, SIZES } from "@/app/lib/styles";
 
 type TaskCardProps = {
   task: Task;
@@ -36,7 +37,7 @@ function TaskStatusOptions({ currentStatus }: TaskStatusOptionsProps) {
 function TaskDropdownMenu({ status, onMove, isMoving }: TaskDropdownMenuProps) {
   return (
     <select
-      className="text-xs bg-transparent text-indigo-300 cursor-default"
+      className={`text-xs bg-transparent ${COLORS.BtnTextColor.primary} cursor-default`}
       defaultValue=""
       onClick={(e) => e.stopPropagation()}
       onChange={(e) => {
@@ -62,12 +63,14 @@ export default function TaskCard({
 }: TaskCardProps) {
   return (
     <CardShell
-      className={`${className} flex flex-col gap-2 px-4 py-3 md:px-6 md:py-4`}
+      className={`${className} flex flex-col gap-2 ${SIZES.cardPadding}`}
     >
       <div className="cursor-pointer" onClick={() => onSelect?.(task)}>
         <p className="font-medium">{task.title}</p>
         {task.description && (
-          <p className="text-xs text-gray-400">{task.description}</p>
+          <p className={`text-xs ${COLORS.textSecondary}`}>
+            {task.description}
+          </p>
         )}
       </div>
 

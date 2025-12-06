@@ -1,5 +1,6 @@
 "use client";
 
+import { COLORS } from "@/app/lib/styles";
 import { ReactNode } from "react";
 
 type PageTitleProps = {
@@ -8,7 +9,9 @@ type PageTitleProps = {
 
 export function PageTitle({ children }: PageTitleProps) {
   return (
-    <h1 className="text-2xl font-semibold text-gray-100 tracking-tight">
+    <h1
+      className={`text-2xl font-semibold ${COLORS.textPrimary} tracking-tight`}
+    >
       {children}
     </h1>
   );

@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import AuthCard from "../_components/AuthCard";
 import AuthInput from "../_components/AuthInput";
+import { COLORS, SIZES } from "@/app/lib/styles";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -50,13 +51,17 @@ export default function LoginPage() {
           label="Password"
           placeholder="Enter your password"
         />
-        <p className="text-xs text-gray-500 text-right hover:text-indigo-400 transition">
+        <p
+          className={`text-xs ${COLORS.textMuted} text-right hover:text-indigo-400 transition`}
+        >
           <a href="/forgot-password">Forgot your password? Reset it</a>
         </p>
         <button
           type="submit"
           disabled={isDisabled}
-          className={`w-full py-3 rounded-xl text-white text-base font-semibold tracking-wide ${
+          className={`w-full py-3 ${
+            SIZES.radiusMedium
+          } text-white text-base font-semibold tracking-wide ${
             isDisabled
               ? "bg-indigo-400/30"
               : "bg-indigo-950 hover:bg-indigo-800 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900"
@@ -65,7 +70,7 @@ export default function LoginPage() {
           Login
         </button>
       </form>
-      <p className="text-sm text-gray-400 text-center">
+      <p className={`text-sm ${COLORS.textSecondary} text-center`}>
         Don’t have an account?{" "}
         <a href="/signup" className="text-indigo-400 hover:underline">
           Sign up

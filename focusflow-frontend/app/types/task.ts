@@ -1,3 +1,5 @@
+import { COLORS } from "../lib/styles";
+
 export type TaskStatus = "TODO" | "IN_PROGRESS" | "BLOCKED" | "DONE";
 export const TASK_STATUSES: TaskStatus[] = [
   "TODO",
@@ -35,21 +37,21 @@ export const PROJECT_TASK_COLUMNS: ColumnConfig[] = [
   {
     status: "TODO",
     title: "TODO",
-    titleColor: "text-cyan-500/50",
+    titleColor: `${COLORS.statusText.todo}`,
   },
   {
     status: "IN_PROGRESS",
     title: "In Progress",
-    titleColor: "text-yellow-500/50",
+    titleColor: `${COLORS.statusText.inProgress}`,
   },
   {
     status: "BLOCKED",
     title: "Blocked",
-    titleColor: "text-zinc-500/50",
+    titleColor: `${COLORS.statusText.blocked}`,
   },
   {
     status: "DONE",
     title: "Completed",
-    titleColor: "text-emerald-500/50",
+    titleColor: `${COLORS.statusText.done}`,
   },
 ];

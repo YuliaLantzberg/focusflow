@@ -2,6 +2,7 @@
 import { useState } from "react";
 import AuthCard from "../_components/AuthCard";
 import AuthInput from "../_components/AuthInput";
+import { COLORS, SIZES } from "@/app/lib/styles";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -32,7 +33,9 @@ export default function ForgotPassword() {
         <button
           type="submit"
           disabled={isDisabled}
-          className={`w-full py-3 rounded-xl text-white text-base font-semibold tracking-wide ${
+          className={`w-full py-3 ${
+            SIZES.radiusMedium
+          } text-white text-base font-semibold tracking-wide ${
             isDisabled
               ? "bg-indigo-400/30"
               : "bg-indigo-950 hover:bg-indigo-800 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900"
@@ -41,7 +44,7 @@ export default function ForgotPassword() {
           Send reset link
         </button>
       </form>
-      <p className="text-xs text-gray-500 text-center mt-4">
+      <p className={`text-xs ${COLORS.textMuted} text-center mt-4`}>
         Back to{" "}
         <a href="/login" className="text-indigo-400 hover:underline">
           login

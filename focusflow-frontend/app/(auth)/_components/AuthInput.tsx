@@ -1,5 +1,7 @@
 "use client";
 
+import { STYLES } from "@/app/lib/styles";
+
 export default function AuthInput({
   label,
   type,
@@ -23,7 +25,7 @@ export default function AuthInput({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
+        className={STYLES.form.field}
       />
     </>
   );

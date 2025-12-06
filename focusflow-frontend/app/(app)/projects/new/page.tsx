@@ -9,6 +9,7 @@ import PageSection from "../../_components/page-section";
 import FormCard from "../../_components/forms/form-card";
 import { FormField } from "../../_components/forms/form-field";
 import SubmitButton from "../../_components/buttons/submit-button";
+import { STYLES } from "@/app/lib/styles";
 
 export default function NewProjectPage() {
   const router = useRouter();
@@ -44,7 +45,7 @@ export default function NewProjectPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Website redesign for client X"
-              className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700"
+              className={STYLES.form.field}
             />
           </FormField>
           <FormField label="Description">
@@ -52,7 +53,7 @@ export default function NewProjectPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Short summary of the project..."
-              className="w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700 min-h-32 resize-none"
+              className={`${STYLES.form.field} min-h-32 resize-none`}
             />
           </FormField>
           <SubmitButton>Create Project</SubmitButton>

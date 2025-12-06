@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import AuthCard from "../_components/AuthCard";
 import AuthInput from "../_components/AuthInput";
+import { COLORS, SIZES } from "@/app/lib/styles";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -56,7 +57,9 @@ export default function SignupPage() {
         <button
           type="submit"
           disabled={isDisabled}
-          className={`w-full py-3 rounded-xl text-white text-base font-semibold tracking-wide ${
+          className={`w-full py-3 ${
+            SIZES.radiusMedium
+          } text-white text-base font-semibold tracking-wide ${
             isDisabled
               ? "bg-indigo-400/30"
               : "bg-indigo-950 hover:bg-indigo-800 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900"
@@ -65,7 +68,7 @@ export default function SignupPage() {
           Signup
         </button>
       </form>
-      <p className="text-sm text-gray-400 text-center">
+      <p className={`text-sm ${COLORS.textSecondary} text-center`}>
         Already have an account?{" "}
         <a href="/login" className="text-indigo-400 hover:underline">
           Log in
