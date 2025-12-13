@@ -11,12 +11,12 @@ export default function ModalShell({ children, onClose }: ModalShellProps) {
     <>
       <div
         id="modal-overlay"
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-40`}
         onClick={onClose}
       />
       <div
         id="modal-content"
-        className={`fixed inset-0 z-50 ${STYLES.flexCenter}`}
+        className={`fixed inset-0 z-50 ${STYLES.flexCenterCenter}`}
       >
         <div
           className={`relative w-full max-w-2xl mx-4 ${SIZES.radiusLarge} border ${COLORS.border} bg-slate-900/95 shadow-2xl flex flex-col min-h-[60vh]`}

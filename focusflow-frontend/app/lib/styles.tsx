@@ -29,6 +29,7 @@ export const SIZES = {
 
 export const STYLES = {
   flexCenter: "flex justify-between items-center",
+  flexCenterCenter: "flex justify-center items-center",
   form: {
     field:
       "w-full p-4 rounded-xl bg-slate-800 text-white border border-slate-700",
