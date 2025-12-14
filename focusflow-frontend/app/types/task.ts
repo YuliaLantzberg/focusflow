@@ -14,7 +14,7 @@ export interface Task {
   description?: string;
   dueDate?: string;
   priority?: number;
-  order?: number;
+  order: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -23,4 +23,6 @@ export type CreateTaskPayload = {
   title: string;
   description?: string;
   dueDate?: string;
+  order: number;
+  status: TaskStatus;
 };

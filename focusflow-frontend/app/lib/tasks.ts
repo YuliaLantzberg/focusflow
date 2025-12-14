@@ -3,11 +3,12 @@ import { Task, TaskStatus, CreateTaskPayload } from "../types/task";
 
 export async function moveTask(
   taskId: string,
-  status: TaskStatus
+  status: TaskStatus,
+  order: number
 ): Promise<Task> {
   const res = await apiFetch(`http://localhost:3000/tasks/${taskId}/move`, {
     method: "PATCH",
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ status, order }),
   });
   if (!res.ok) {
     throw new Error(`Failed move task ${taskId}: ${res.status}`);

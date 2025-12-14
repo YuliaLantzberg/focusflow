@@ -23,7 +23,7 @@ import { getProjectStatusColor } from "@/app/lib/statusColor";
 import { createTask, moveTask } from "@/app/lib/tasks";
 
 import { Project } from "@/app/types/project";
-import { Task, TaskStatus } from "@/app/types/task";
+import { Task, TaskStatus, TASK_STATUSES } from "@/app/types/task";
 import { PROJECT_TASK_COLUMNS } from "@/app/types/project";
 
 import { PageTitle } from "../../_components/page-title";
@@ -45,6 +45,7 @@ export default function ProjectDetailPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
+  const [newTaskStatus, setNewTaskStatus] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [titleError, setTitleError] = useState<string | null>(null);
   const [movingTaskId, setMovingTaskId] = useState<string | null>(null);
@@ -138,7 +139,12 @@ export default function ProjectDetailPage() {
     const statusFromZone = getStatusFromOverId(overId);
 
     let destStatus: TaskStatus | null = statusFromZone;
-
+    let destColumn = tasks
+      .filter((t) => t.status === destStatus)
+      .sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0) || a.id.localeCompare(b.id)
+      );
+    let destIndex: number | null;
     if (!destStatus) {
       // overId is a task id → destination status comes from that task
       const overTask = tasks.find((t) => t.id === overId);
@@ -149,10 +155,17 @@ export default function ProjectDetailPage() {
     // 2) Same-column reorder
     if (destStatus === sourceStatus) {
       // Only reorder within tasks that share this status
-      const columnTasks = tasks.filter((t) => t.status === sourceStatus);
+      const columnTasks = tasks
+        .filter((t) => t.status === sourceStatus)
+        ?.sort(
+          (a, b) => (a.order ?? 0) - (b.order ?? 0) || a.id.localeCompare(b.id)
+        );
       const oldIndex = columnTasks.findIndex((t) => t.id === activeId);
 
-      // Where should it go?
+      // Remove active from its column, insert into destination column
+      destColumn = destColumn.filter(
+        (t) => t.status === sourceStatus && t.id !== activeId
+      );
       // If dropped on a dropzone/column background, we place it at end
       const newIndex = statusFromZone
         ? columnTasks.length - 1
@@ -173,7 +186,6 @@ export default function ProjectDetailPage() {
     }
 
     // 3) Cross-column move (status changes)
-    // Optimistic UI update first
     setTasks((prev) => {
       // Remove active from its column, insert into destination column
       const source = prev.filter(
@@ -190,7 +202,6 @@ export default function ProjectDetailPage() {
       const insertIndex = statusFromZone
         ? dest.length
         : dest.findIndex((t) => t.id === overId);
-
       const newDest =
         insertIndex === -1
           ? [...dest, updatedMoving]
@@ -208,17 +219,34 @@ export default function ProjectDetailPage() {
     });
     // Persist to backend (your existing function)
     try {
-      await handleMove(activeId, destStatus);
+      destIndex = statusFromZone
+        ? destColumn.length
+        : destColumn.findIndex((t) => t.id === overId);
+      const prevTask = destColumn[destIndex - 1];
+      const nextTask = destColumn[destIndex];
+      let newOrder: number | null;
+
+      if (prevTask && nextTask)
+        newOrder = (prevTask.order + nextTask.order) / 2;
+      else if (prevTask && !nextTask) newOrder = prevTask.order + 1000;
+      else if (!prevTask && nextTask) newOrder = nextTask.order - 1000;
+      else newOrder = 1000;
+
+      await handleMove(activeId, destStatus, newOrder);
     } catch (err) {
       console.error("Failed to persist move", err);
       // optional: refetch tasks from server here to be safe
     }
   };
 
-  const handleMove = async (taskId: string, status: TaskStatus) => {
+  const handleMove = async (
+    taskId: string,
+    status: TaskStatus,
+    order: number
+  ) => {
     setMovingTaskId(taskId);
     try {
-      const updated = await moveTask(taskId, status);
+      const updated = await moveTask(taskId, status, order);
       setTasks((prev) =>
         prev.map((task) => (task.id === taskId ? updated : task))
       );
@@ -235,6 +263,12 @@ export default function ProjectDetailPage() {
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
+    const TODOTasks = tasks
+      .filter((task) => task.status === TASK_STATUSES[0])
+      .sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0) || a.id.localeCompare(b.id)
+      );
+    const maxOrderInTODOColumn = TODOTasks[TODOTasks.length - 1].order;
     setTitleError(null);
     if (!newTitle.trim()) {
       setTitleError("Task title is required");
@@ -245,6 +279,8 @@ export default function ProjectDetailPage() {
       const newTask = await createTask(projectId, {
         title: newTitle,
         description: newDescription,
+        order: maxOrderInTODOColumn + 1000,
+        status: TASK_STATUSES[0], //New Task is always in TODO column
       });
       if (newTask) {
         setTasks((prev) => [...prev, newTask]);
@@ -356,7 +392,13 @@ export default function ProjectDetailPage() {
                   title={column.title}
                   titleColor={column.titleColor}
                   taskStatus={column.status}
-                  tasks={tasks.filter((t) => t.status === column.status)}
+                  tasks={tasks
+                    .filter((t) => t.status === column.status)
+                    .sort(
+                      (a, b) =>
+                        (a.order ?? 0) - (b.order ?? 0) ||
+                        a.id.localeCompare(b.id)
+                    )}
                   onMove={handleMove}
                   movingTaskId={movingTaskId}
                   onSelect={handleSelectTask}
