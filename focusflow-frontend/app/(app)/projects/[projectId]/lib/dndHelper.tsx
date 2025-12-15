@@ -40,3 +40,16 @@ export function resolveDestination(
     if (task) return { destStatus: task.status, destType: "TASK" };
   }
 }
+
+// Returns tasks list within a destination column without the active task
+export function getVirtualDestList(
+  tasks: Task[],
+  destStatus: TaskStatus,
+  activeId: string
+): Task[] {
+  return tasks
+    .filter((task) => task.status === destStatus && task.id !== activeId)
+    .sort(
+      (a, b) => (a.order ?? 0) - (b.order ?? 0) || a.id.localeCompare(b.id)
+    );
+}
