@@ -31,7 +31,7 @@ export function isTaskId(id: string): boolean {
 export function resolveDestination(
   overId: string,
   tasks: Task[]
-): { destStatus: TaskStatus; destType: DestType } | undefined {
+): { destStatus: TaskStatus; destType: DestType } {
   const status = getStatusFromOverId(overId);
   if (status) {
     return { destStatus: status, destType: "ZONE" };
@@ -39,6 +39,7 @@ export function resolveDestination(
     const task = tasks.find((task) => task.id === overId);
     if (task) return { destStatus: task.status, destType: "TASK" };
   }
+  return { destStatus: "TODO", destType: "ZONE" };
 }
 
 // Returns tasks list within a destination column without the active task
@@ -52,4 +53,23 @@ export function getVirtualDestList(
     .sort(
       (a, b) => (a.order ?? 0) - (b.order ?? 0) || a.id.localeCompare(b.id)
     );
+}
+
+export function getDestIndex(
+  destType: DestType,
+  overId: string,
+  destList: Task[]
+): number {
+  let destIndex = 0;
+  // Case A — Dropping on a zone: append in the end
+  if (destType === "ZONE") {
+    destIndex = destList.length;
+  }
+  // Case B — Dropping on a task: if no such id in the list - append in the end; else insert before hovered task
+  if (destType === "TASK") {
+    const idx = destList.findIndex((task) => task.id === overId);
+    if (idx === -1) destIndex = destList.length;
+    else destIndex = idx;
+  }
+  return destIndex;
 }

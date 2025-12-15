@@ -38,7 +38,12 @@ import { CreateNewButton } from "../../_components/buttons/create-new-button";
 import { CardTitle } from "../../_components/card/card-title";
 import { COLORS, SIZES, STYLES } from "@/app/lib/styles";
 import TaskCard from "../../tasks/_components/task-card";
-import { getStatusFromOverId } from "./lib/dndHelper";
+import {
+  getDestIndex,
+  getStatusFromOverId,
+  getVirtualDestList,
+  resolveDestination,
+} from "./lib/dndHelper";
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -108,16 +113,32 @@ export default function ProjectDetailPage() {
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
-    // const { active, over } = event;
-    // // Clear dragging UI state
-    // setActiveId(null);
-    // const activeId = String(active.id);
-    // const overId = over?.id ? String(over.id) : lastOverId;
-    // setLastOverId(null);
-    // if (!overId) return;
-    // if (activeId === overId) return;
-    // const activeTask = tasks.find((t) => t.id === activeId);
-    // if (!activeTask) return;
+    const { active, over } = event;
+
+    setActiveId(null);
+    const activeId = String(active.id);
+    const overId = over?.id ? String(over.id) : lastOverId;
+    setLastOverId(null);
+    if (!overId) return;
+    if (activeId === overId) return;
+    const activeTask = tasks.find((t) => t.id === activeId);
+    if (!activeTask) return;
+    const { destStatus, destType } = resolveDestination(overId, tasks);
+
+    const destList = getVirtualDestList(tasks, destStatus, activeId);
+
+    const destIndex = getDestIndex(destType, overId, destList);
+
+    console.log({
+      activeId,
+      overId,
+      destStatus,
+      destType,
+      destIndex,
+      destList: destList.map((t) => [t.id, t.order]),
+    });
+
+    return;
     // const sourceStatus = activeTask.status;
     // // 1) Determine destination status
     // const statusFromZone = getStatusFromOverId(overId);
