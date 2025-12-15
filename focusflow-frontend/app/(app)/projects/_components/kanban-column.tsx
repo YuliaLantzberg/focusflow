@@ -17,7 +17,11 @@ type KanbanColumnProps = {
   taskStatus: TaskStatus;
   tasks: Task[];
   movingTaskId: string | null;
-  onMove: (taskId: string, status: TaskStatus) => void | Promise<void>;
+  onMove: (
+    taskId: string,
+    status: TaskStatus,
+    order: number
+  ) => void | Promise<void>;
   onSelect?: (task: Task) => void;
   onUpdate?: (updated: Task) => void;
   activeId?: string | null;
@@ -65,7 +69,7 @@ export default function KanbanColumn({
                 <TaskCard
                   key={task.id}
                   task={task}
-                  onMove={(status) => onMove(task.id, status)}
+                  onMove={(status) => onMove(task.id, status, task.order)}
                   isMoving={movingTaskId === task.id}
                   onSelect={onSelect}
                 />

@@ -38,6 +38,7 @@ import { CreateNewButton } from "../../_components/buttons/create-new-button";
 import { CardTitle } from "../../_components/card/card-title";
 import { COLORS, SIZES, STYLES } from "@/app/lib/styles";
 import TaskCard from "../../tasks/_components/task-card";
+import { getStatusFromOverId } from "./lib/dndHelper";
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -45,7 +46,6 @@ export default function ProjectDetailPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
-  const [newTaskStatus, setNewTaskStatus] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [titleError, setTitleError] = useState<string | null>(null);
   const [movingTaskId, setMovingTaskId] = useState<string | null>(null);
@@ -73,16 +73,6 @@ export default function ProjectDetailPage() {
       },
     })
   );
-
-  const getStatusFromOverId = (overId: string): TaskStatus | null => {
-    if (overId.startsWith("column-")) {
-      return overId.replace("column-", "") as TaskStatus;
-    }
-    if (overId.endsWith("-dropzone")) {
-      return overId.replace("-dropzone", "") as TaskStatus;
-    }
-    return null;
-  };
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
@@ -118,125 +108,110 @@ export default function ProjectDetailPage() {
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    // Clear dragging UI state
-    setActiveId(null);
-
-    const activeId = String(active.id);
-    const overId = over?.id ? String(over.id) : lastOverId;
-    setLastOverId(null);
-
-    if (!overId) return;
-    if (activeId === overId) return;
-
-    const activeTask = tasks.find((t) => t.id === activeId);
-    if (!activeTask) return;
-
-    const sourceStatus = activeTask.status;
-
-    // 1) Determine destination status
-    const statusFromZone = getStatusFromOverId(overId);
-
-    let destStatus: TaskStatus | null = statusFromZone;
-    let destColumn = tasks
-      .filter((t) => t.status === destStatus)
-      .sort(
-        (a, b) => (a.order ?? 0) - (b.order ?? 0) || a.id.localeCompare(b.id)
-      );
-    let destIndex: number | null;
-    if (!destStatus) {
-      // overId is a task id → destination status comes from that task
-      const overTask = tasks.find((t) => t.id === overId);
-      if (!overTask) return;
-      destStatus = overTask.status;
-    }
-
-    // 2) Same-column reorder
-    if (destStatus === sourceStatus) {
-      // Only reorder within tasks that share this status
-      const columnTasks = tasks
-        .filter((t) => t.status === sourceStatus)
-        ?.sort(
-          (a, b) => (a.order ?? 0) - (b.order ?? 0) || a.id.localeCompare(b.id)
-        );
-      const oldIndex = columnTasks.findIndex((t) => t.id === activeId);
-
-      // Remove active from its column, insert into destination column
-      destColumn = destColumn.filter(
-        (t) => t.status === sourceStatus && t.id !== activeId
-      );
-      // If dropped on a dropzone/column background, we place it at end
-      const newIndex = statusFromZone
-        ? columnTasks.length - 1
-        : columnTasks.findIndex((t) => t.id === overId);
-
-      if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return;
-
-      // Reorder ids in that column
-      const reordered = arrayMove(columnTasks, oldIndex, newIndex);
-
-      // Merge back into the full tasks array without mixing columns
-      setTasks((prev) => {
-        const others = prev.filter((t) => t.status !== sourceStatus);
-        return [...others, ...reordered];
-      });
-
-      return;
-    }
-
-    // 3) Cross-column move (status changes)
-    setTasks((prev) => {
-      // Remove active from its column, insert into destination column
-      const source = prev.filter(
-        (t) => t.status === sourceStatus && t.id !== activeId
-      );
-      const dest = prev.filter((t) => t.status === destStatus);
-
-      const moving = prev.find((t) => t.id === activeId)!;
-      const updatedMoving = { ...moving, status: destStatus! };
-
-      // Decide insert index:
-      // - dropped on task → insert before that task
-      // - dropped on dropzone/column → append to end
-      const insertIndex = statusFromZone
-        ? dest.length
-        : dest.findIndex((t) => t.id === overId);
-      const newDest =
-        insertIndex === -1
-          ? [...dest, updatedMoving]
-          : [
-              ...dest.slice(0, insertIndex),
-              updatedMoving,
-              ...dest.slice(insertIndex),
-            ];
-
-      const others = prev.filter(
-        (t) => t.status !== sourceStatus && t.status !== destStatus
-      );
-
-      return [...others, ...source, ...newDest];
-    });
-    // Persist to backend (your existing function)
-    try {
-      destIndex = statusFromZone
-        ? destColumn.length
-        : destColumn.findIndex((t) => t.id === overId);
-      const prevTask = destColumn[destIndex - 1];
-      const nextTask = destColumn[destIndex];
-      let newOrder: number | null;
-
-      if (prevTask && nextTask)
-        newOrder = (prevTask.order + nextTask.order) / 2;
-      else if (prevTask && !nextTask) newOrder = prevTask.order + 1000;
-      else if (!prevTask && nextTask) newOrder = nextTask.order - 1000;
-      else newOrder = 1000;
-
-      await handleMove(activeId, destStatus, newOrder);
-    } catch (err) {
-      console.error("Failed to persist move", err);
-      // optional: refetch tasks from server here to be safe
-    }
+    // const { active, over } = event;
+    // // Clear dragging UI state
+    // setActiveId(null);
+    // const activeId = String(active.id);
+    // const overId = over?.id ? String(over.id) : lastOverId;
+    // setLastOverId(null);
+    // if (!overId) return;
+    // if (activeId === overId) return;
+    // const activeTask = tasks.find((t) => t.id === activeId);
+    // if (!activeTask) return;
+    // const sourceStatus = activeTask.status;
+    // // 1) Determine destination status
+    // const statusFromZone = getStatusFromOverId(overId);
+    // let destStatus: TaskStatus | null = statusFromZone;
+    // let destColumn: Task[];
+    // if (!destStatus) {
+    //   // overId is a task id → destination status comes from that task
+    //   const overTask = tasks.find((t) => t.id === overId);
+    //   if (!overTask) return;
+    //   destStatus = overTask.status;
+    // }
+    // // 2) Same-column reorder
+    // console.log({ activeId, overId, statusFromZone, sourceStatus, destStatus });
+    // if (destStatus === sourceStatus) {
+    //   // Only reorder within tasks that share this status
+    //   const columnTasks = tasks
+    //     .filter((t) => t.status === sourceStatus)
+    //     ?.sort(
+    //       (a, b) => (a.order ?? 0) - (b.order ?? 0) || a.id.localeCompare(b.id)
+    //     );
+    //   const oldIndex = columnTasks.findIndex((t) => t.id === activeId);
+    //   // If dropped on a dropzone/column background, we place it at end
+    //   const newIndex = statusFromZone
+    //     ? columnTasks.length - 1
+    //     : columnTasks.findIndex((t) => t.id === overId);
+    //   if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return;
+    //   // Reorder ids in that column
+    //   const reordered = arrayMove(columnTasks, oldIndex, newIndex);
+    //   // Merge back into the full tasks array without mixing columns
+    //   setTasks((prev) => {
+    //     const others = prev.filter((t) => t.status !== sourceStatus);
+    //     return [...others, ...reordered];
+    //   });
+    //   return;
+    // }
+    // // 3) Cross-column move (status changes)
+    // setTasks((prev) => {
+    //   // Remove active from its column, insert into destination column
+    //   const source = prev.filter(
+    //     (t) => t.status === sourceStatus && t.id !== activeId
+    //   );
+    //   const dest = prev.filter((t) => t.status === destStatus);
+    //   const moving = prev.find((t) => t.id === activeId)!;
+    //   const updatedMoving = { ...moving, status: destStatus! };
+    //   // Decide insert index:
+    //   // - dropped on task → insert before that task
+    //   // - dropped on dropzone/column → append to end
+    //   const insertIndex = statusFromZone
+    //     ? dest.length
+    //     : dest.findIndex((t) => t.id === overId);
+    //   const newDest =
+    //     insertIndex === -1
+    //       ? [...dest, updatedMoving]
+    //       : [
+    //           ...dest.slice(0, insertIndex),
+    //           updatedMoving,
+    //           ...dest.slice(insertIndex),
+    //         ];
+    //   const others = prev.filter(
+    //     (t) => t.status !== sourceStatus && t.status !== destStatus
+    //   );
+    //   return [...others, ...source, ...newDest];
+    // });
+    // // Persist to backend (your existing function)
+    // destColumn = tasks
+    //   .filter((t) => t.status === destStatus)
+    //   .sort(
+    //     (a, b) => (a.order ?? 0) - (b.order ?? 0) || a.id.localeCompare(b.id)
+    //   );
+    // if (destStatus === sourceStatus) {
+    //   // Remove active from its column, insert into destination column
+    //   destColumn = destColumn.filter(
+    //     (t) => t.status === sourceStatus && t.id !== activeId
+    //   );
+    // }
+    // let destIndex: number | null;
+    // try {
+    //   console.log("persisting...");
+    //   destIndex = statusFromZone
+    //     ? destColumn.length
+    //     : destColumn.findIndex((t) => t.id === overId);
+    //   const prevTask = destColumn[destIndex - 1];
+    //   const nextTask = destColumn[destIndex];
+    //   let newOrder: number | null;
+    //   if (prevTask && nextTask)
+    //     newOrder = (prevTask.order + nextTask.order) / 2;
+    //   else if (prevTask && !nextTask) newOrder = prevTask.order + 1000;
+    //   else if (!prevTask && nextTask) newOrder = nextTask.order - 1000;
+    //   else newOrder = 1000;
+    //   await handleMove(activeId, destStatus, newOrder);
+    // } catch (err) {
+    //   console.error("Failed to persist move", err);
+    //   // optional: refetch tasks from server here to be safe
+    // }
   };
 
   const handleMove = async (
