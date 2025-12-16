@@ -4,6 +4,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { MoveTaskDto } from './dto/move-task.dto';
+import { TaskStatus } from '@prisma/client';
 
 @Injectable()
 export class TasksService {
@@ -99,5 +100,28 @@ export class TasksService {
         ...(status !== undefined && { status }),
       },
     });
+  }
+
+  private async renormalizeColumn(
+    projectId: string,
+    status: TaskStatus,
+  ): Promise<void> {
+    // fetch tasks for one column (status)
+    const statusTasks = await this.prisma.task.findMany({
+      where: { projectId, status },
+      orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
+    });
+    // For each task at index i, new order is (i + 1) * 1000
+    if (statusTasks.length === 0) return;
+    const updates = statusTasks.map((task, index) => {
+      const newOrder = (index + 1) * 1000;
+
+      return this.prisma.task.update({
+        where: { id: task.id },
+        data: { order: newOrder },
+      });
+    });
+
+    await this.prisma.$transaction(updates);
   }
 }
