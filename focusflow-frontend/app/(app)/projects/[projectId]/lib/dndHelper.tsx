@@ -12,22 +12,6 @@ export const getStatusFromOverId = (overId: string): TaskStatus | null => {
   return null;
 };
 
-export function isColumnId(id: string): boolean {
-  if (id.startsWith("column-")) return true;
-  return false;
-}
-
-export function isDropzoneId(id: string): boolean {
-  if (id.endsWith("-dropzone")) return true;
-  return false;
-}
-
-export function isTaskId(id: string): boolean {
-  const isStatus = getStatusFromOverId(id);
-  if (!isStatus) return true;
-  return false;
-}
-
 export function resolveDestination(
   overId: string,
   tasks: Task[]
@@ -78,14 +62,12 @@ export function getNewOrder(destList: Task[], destIndex: number): number {
   let prev: Task | null = null;
   let next: Task | null = null;
   let newOrder = 0;
-  console.log({
-    destListLength: destList.length,
-    destIndex,
-  });
+
   if (destIndex > 0) {
     prev = destList[destIndex - 1];
   }
   if (destIndex < destList.length) next = destList[destIndex];
+
   if (prev && next) {
     newOrder = (prev.order + next.order) / 2;
   } else if (prev && !next) {
@@ -95,11 +77,6 @@ export function getNewOrder(destList: Task[], destIndex: number): number {
   } else {
     newOrder = 1000;
   }
-  console.log({
-    prev,
-    next,
-    newOrder,
-  });
-
+  console.log("PREV", prev?.order, "NEXT", next?.order, "NEW_ORDER", newOrder);
   return newOrder;
 }
