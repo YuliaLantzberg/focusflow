@@ -73,3 +73,33 @@ export function getDestIndex(
   }
   return destIndex;
 }
+
+export function getNewOrder(destList: Task[], destIndex: number): number {
+  let prev: Task | null = null;
+  let next: Task | null = null;
+  let newOrder = 0;
+  console.log({
+    destListLength: destList.length,
+    destIndex,
+  });
+  if (destIndex > 0) {
+    prev = destList[destIndex - 1];
+  }
+  if (destIndex < destList.length) next = destList[destIndex];
+  if (prev && next) {
+    newOrder = (prev.order + next.order) / 2;
+  } else if (prev && !next) {
+    newOrder = prev.order + 1000;
+  } else if (!prev && next) {
+    newOrder = next.order - 1000;
+  } else {
+    newOrder = 1000;
+  }
+  console.log({
+    prev,
+    next,
+    newOrder,
+  });
+
+  return newOrder;
+}

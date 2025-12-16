@@ -40,6 +40,7 @@ import { COLORS, SIZES, STYLES } from "@/app/lib/styles";
 import TaskCard from "../../tasks/_components/task-card";
 import {
   getDestIndex,
+  getNewOrder,
   getStatusFromOverId,
   getVirtualDestList,
   resolveDestination,
@@ -114,30 +115,24 @@ export default function ProjectDetailPage() {
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
-
     setActiveId(null);
     const activeId = String(active.id);
-    const overId = over?.id ? String(over.id) : lastOverId;
-    setLastOverId(null);
+    const overId = String(over?.id);
+    console.log("console 1", { activeId, overId });
     if (!overId) return;
     if (activeId === overId) return;
     const activeTask = tasks.find((t) => t.id === activeId);
     if (!activeTask) return;
+    console.log("console 2: active task", activeTask.title);
     const { destStatus, destType } = resolveDestination(overId, tasks);
-
+    console.log("console 3: ", { destStatus, destType });
     const destList = getVirtualDestList(tasks, destStatus, activeId);
-
+    console.log("console 4 destList: ", destList);
     const destIndex = getDestIndex(destType, overId, destList);
+    console.log("console 5 destIndex: ", destIndex);
 
-    console.log({
-      activeId,
-      overId,
-      destStatus,
-      destType,
-      destIndex,
-      destList: destList.map((t) => [t.id, t.order]),
-    });
-
+    const newOrder = getNewOrder(destList, destIndex);
+    console.log("console 6 destIndex: ", newOrder);
     return;
     // const sourceStatus = activeTask.status;
     // // 1) Determine destination status
@@ -300,6 +295,7 @@ export default function ProjectDetailPage() {
   const handleTaskDelete = (deletedId: string) => {
     setTasks((prev) => prev.filter((task) => task.id !== deletedId));
   };
+  console.log("tasks", tasks);
 
   if (!project)
     return (
