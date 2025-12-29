@@ -9,5 +9,6 @@ import { NotesModule } from 'src/notes/notes.module';
   imports: [PrismaModule, TasksModule, NotesModule],
   providers: [ProjectsService],
   controllers: [ProjectsController],
+  exports: [ProjectsService],
 })
 export class ProjectsModule {}

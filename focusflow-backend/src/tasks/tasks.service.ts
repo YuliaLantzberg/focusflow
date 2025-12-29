@@ -5,12 +5,16 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { MoveTaskDto } from './dto/move-task.dto';
 import { Task, TaskStatus } from '@prisma/client';
+import { ProjectTasksService } from 'src/projectTasks/projectTasks.service';
 
 @Injectable()
 export class TasksService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly projectTasksService: ProjectTasksService,
+  ) {}
 
-  create(projectId, createTaskDto: CreateTaskDto) {
+  async create(projectId: string, createTaskDto: CreateTaskDto) {
     const {
       title,
       description,
@@ -23,7 +27,7 @@ export class TasksService {
       isBillable,
       cost,
     } = createTaskDto;
-    return this.prisma.task.create({
+    const newTask = await this.prisma.task.create({
       data: {
         title,
         description,
@@ -40,6 +44,9 @@ export class TasksService {
         },
       },
     });
+
+    await this.projectTasksService.recalcAndPersistProjectStatus(projectId);
+    return newTask;
   }
 
   findAll(projectId: string, filter: GetTasksFilterDto) {
@@ -61,9 +68,9 @@ export class TasksService {
     return this.prisma.task.findUnique({ where: { id, isVisible: true } });
   }
 
-  update(id: string, updateTaskDto: UpdateTaskDto) {
+  async update(id: string, updateTaskDto: UpdateTaskDto) {
     const { dueDate } = updateTaskDto;
-    return this.prisma.task.update({
+    const updatedTask = await this.prisma.task.update({
       where: {
         id,
       },
@@ -80,15 +87,23 @@ export class TasksService {
         cost: updateTaskDto.cost,
       },
     });
+    await this.projectTasksService.recalcAndPersistProjectStatus(
+      updatedTask.projectId,
+    );
+    return updatedTask;
   }
 
-  remove(id: string) {
-    return this.prisma.task.update({
+  async remove(id: string) {
+    const removedTask = await this.prisma.task.update({
       where: { id },
       data: {
         isVisible: false,
       },
     });
+    await this.projectTasksService.recalcAndPersistProjectStatus(
+      removedTask.projectId,
+    );
+    return removedTask;
   }
 
   async move(movingTaskId: string, moveTaskDto: MoveTaskDto) {
@@ -184,13 +199,17 @@ export class TasksService {
       }
     }
 
-    return this.prisma.task.update({
+    const movedTask = await this.prisma.task.update({
       where: { id: movingTaskId },
       data: {
         ...(status !== undefined && { status: targetStatus }),
         ...(order !== undefined && { order: finalOrder }),
       },
     });
+    await this.projectTasksService.recalcAndPersistProjectStatus(
+      movedTask.projectId,
+    );
+    return movedTask;
   }
 
   private async renormalizeColumn(
