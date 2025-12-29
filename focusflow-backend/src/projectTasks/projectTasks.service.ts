@@ -7,6 +7,7 @@ export class ProjectTasksService {
   constructor(private readonly prisma: PrismaService) {}
 
   async recalcAndPersistProjectStatus(projectId: string) {
+    const countsFilter = { projectId, isVisible: true };
     const project = await this.prisma.project.findUnique({
       where: { id: projectId },
     });
@@ -16,14 +17,15 @@ export class ProjectTasksService {
       throw ConflictException;
     }
 
-    const total = await this.prisma.task.count({ where: { projectId } });
-
-    const inProgress = await this.prisma.task.count({
-      where: { projectId, status: TaskStatus.IN_PROGRESS },
+    const total = await this.prisma.task.count({
+      where: countsFilter,
     });
 
+    const inProgress = await this.prisma.task.count({
+      where: { ...countsFilter, status: TaskStatus.IN_PROGRESS },
+    });
     const done = await this.prisma.task.count({
-      where: { projectId, status: TaskStatus.DONE },
+      where: { ...countsFilter, status: TaskStatus.DONE },
     });
     const updatedStatus = this.getNextStatusToPersist(curProjStatus, {
       total,
@@ -36,7 +38,7 @@ export class ProjectTasksService {
         data: { status: updatedStatus },
       });
     }
-
+    console.log(updatedStatus);
     return updatedStatus;
   }
 
@@ -44,6 +46,7 @@ export class ProjectTasksService {
     currentProjectStatus: ProjectStatus,
     counts: { total: number; inProgress: number; done: number },
   ): ProjectStatus {
+    console.log(counts);
     let finalProjStatus = currentProjectStatus;
     if (currentProjectStatus === ProjectStatus.ARCHIVED)
       finalProjStatus = ProjectStatus.ARCHIVED;
