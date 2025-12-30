@@ -69,7 +69,7 @@ export function getNewOrder(destList: Task[], destIndex: number): number {
   if (destIndex < destList.length) next = destList[destIndex];
 
   if (prev && next) {
-    newOrder = (prev.order + next.order) / 2;
+    newOrder = Math.floor((prev.order + next.order) / 2);
   } else if (prev && !next) {
     newOrder = prev.order + 1000;
   } else if (!prev && next) {

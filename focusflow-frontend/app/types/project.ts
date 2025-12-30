@@ -38,3 +38,25 @@ export const PROJECT_TASK_COLUMNS: ColumnConfig[] = [
     titleColor: `${COLORS.statusText.done}`,
   },
 ];
+
+export type ProjectStatus =
+  | "PLANNING"
+  | "ACTIVE"
+  | "COMPLETED"
+  | "ON_HOLD"
+  | "ARCHIVED";
+
+interface ProjectStatusInterface {
+  PLANNING: ProjectStatus;
+  ACTIVE: ProjectStatus;
+  COMPLETED: ProjectStatus;
+  ON_HOLD: ProjectStatus;
+  ARCHIVED: ProjectStatus;
+}
+export const PROJECT_STATUSES: ProjectStatusInterface = {
+  PLANNING: "PLANNING",
+  ACTIVE: "ACTIVE",
+  COMPLETED: "COMPLETED",
+  ON_HOLD: "ON_HOLD",
+  ARCHIVED: "ARCHIVED",
+};
