@@ -1,9 +1,10 @@
 # FocusFlow
 
-FocusFlow is a full-stack productivity and project-management application built as a portfolio-quality SaaS project.
-It is designed to demonstrate real-world backend architecture, frontend structure, and product thinking - not just CRUD screens.
+FocusFlow is a full-stack project and task management application built as a portfolio-quality SaaS system.
 
-The app helps users manage projects and tasks with Kanban-style workflows, clear project lifecycle states, and a scalable foundation for analytics and AI features.
+It is designed to demonstrate real-world backend architecture, frontend structure, and product-level decision making - including data consistency, workflow rules, and backend-enforced state.
+
+The application allows users to manage projects and tasks using Kanban-style workflows, explicit project lifecycle states, and a scalable foundation for analytics and AI-driven features.
 
 ## Tech Stack
 
