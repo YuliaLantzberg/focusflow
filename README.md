@@ -116,5 +116,11 @@ FocusFlow is intentionally built to show:
 - Thoughtful product decisions (not just UI)
 - Scalable structure for future analytics and AI
 
-
+## Roadmap (Next)
+- Server-side auth (cookies) + route protection via middleware
+- Analytics dashboards (initial metrics)
+- AI-assisted task planning (MVP)
+- Enhanced dashboard UX
+- Deployment with a demo account
+- Full documentation + short demo video
 
