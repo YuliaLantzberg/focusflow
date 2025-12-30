@@ -124,3 +124,8 @@ FocusFlow is intentionally built to show:
 - Deployment with a demo account
 - Full documentation + short demo video
 
+## Changelog (Recent)
+- Kanban drag & drop with backend-controlled ordering + automatic renormalization
+- Project lifecycle statuses + UI structure for projects area
+- JWT authentication flows + protected backend routes
+- Notes API (CRUD + soft delete)
