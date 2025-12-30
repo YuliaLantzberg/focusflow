@@ -6,6 +6,11 @@ It is designed to demonstrate real-world backend architecture, frontend structur
 
 The application allows users to manage projects and tasks using Kanban-style workflows, explicit project lifecycle states, and a scalable foundation for analytics and AI-driven features.
 
+**Quick Overview**
+- Full-stack SaaS-style project (Next.js + NestJS)
+- Backend-driven workflow logic (ordering, lifecycle rules)
+- Built as a real-world portfolio project, not a tutorial clone
+
 ## Tech Stack
 
 **Backend**
