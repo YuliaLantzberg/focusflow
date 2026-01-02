@@ -1,5 +1,10 @@
 import { apiFetch } from "./apiClient";
-import { Task, TaskStatus, CreateTaskPayload } from "../types/task";
+import {
+  Task,
+  TaskStatus,
+  CreateTaskPayload,
+  OnHoldRequiredError,
+} from "../types/task";
 
 export async function moveTask(
   taskId: string,
@@ -11,7 +16,13 @@ export async function moveTask(
     body: JSON.stringify({ status, order }),
   });
   if (!res.ok) {
-    throw new Error(`Failed move task ${taskId}: ${res.status}`);
+    const errorBody = await res.json();
+    if (res.status === 409) {
+      throw {
+        type: "ON_HOLD_REQUIRED",
+        payload: errorBody,
+      };
+    } else throw new Error(`Failed move task ${taskId}: ${res.status}`);
   }
   return res.json();
 }
@@ -58,4 +69,15 @@ export async function deleteTask(taskId: string): Promise<Task> {
   }
 
   return res.json();
+}
+
+export function isOnHoldRequiredError(
+  err: unknown
+): err is OnHoldRequiredError {
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    "type" in err &&
+    (err as { type?: unknown }).type === "ON_HOLD_REQUIRED"
+  );
 }

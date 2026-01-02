@@ -1,10 +1,6 @@
 import { ProjectStatus, PROJECT_STATUSES } from "@/app/types/project";
-import {
-  TASK_STATUSES_ENUM,
-  TaskMutationIntent,
-  TaskStatus,
-} from "@/app/types/task";
-export function onHoldGate({
+import { TASK_STATUSES_ENUM, TaskMutationIntent } from "@/app/types/task";
+export function isOnHoldProj({
   projectStatus,
   intent,
 }: {

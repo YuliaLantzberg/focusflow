@@ -44,3 +44,8 @@ export type TaskMutationIntent =
   | { type: "create" }
   | { type: "edit" }
   | { type: "delete" };
+
+export type OnHoldRequiredError = {
+  type: "ON_HOLD_REQUIRED";
+  payload?: unknown;
+};

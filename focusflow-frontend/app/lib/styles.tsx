@@ -7,10 +7,16 @@ export const COLORS = {
   textPrimary: "text-gray-100",
   textSecondary: "text-gray-400",
   textMuted: "text-gray-500",
+  textHighlight: "text-yellow-500/50",
 
   BtnTextColor: {
     primary: "text-indigo-300",
     danger: "text-red-300",
+  },
+
+  BtnBgColor: {
+    primary: "bg-emerald-500/50",
+    danger: "bg-red-400/80",
   },
 
   statusText: {

@@ -19,10 +19,15 @@ import {
 import PageContainer from "../../_components/page-container";
 import { loadData } from "@/app/lib/apiClient";
 import { getProjectStatusColor } from "@/app/lib/statusColor";
-import { createTask, moveTask } from "@/app/lib/tasks";
+import { createTask, isOnHoldRequiredError, moveTask } from "@/app/lib/tasks";
 
 import { Project } from "@/app/types/project";
-import { Task, TaskStatus, TASK_STATUSES } from "@/app/types/task";
+import {
+  Task,
+  TaskStatus,
+  TASK_STATUSES,
+  TaskMutationIntent,
+} from "@/app/types/task";
 import { PROJECT_TASK_COLUMNS } from "@/app/types/project";
 
 import { PageTitle } from "../../_components/page-title";
@@ -44,6 +49,9 @@ import {
   getVirtualDestList,
   resolveDestination,
 } from "./lib/dndHelper";
+import { isOnHoldProj } from "../../lib/helper";
+import { ProjectStatus } from "../../../types/project";
+import { OnHoldModal } from "../../_components/modals/onHoldModal";
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -57,9 +65,16 @@ export default function ProjectDetailPage() {
   const [showCreateTaskForm, setShowCreateTaskForm] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [showOnHoldModal, setShowOnHoldModal] = useState<boolean>(false);
   const measuring = { droppable: { strategy: MeasuringStrategy.Always } };
   const activeTask = activeId ? tasks.find((t) => t.id === activeId) : null;
   const lastOverIdRef = useRef<string | null>(null);
+  const preDragTasksRef = useRef<Task[] | null>(null);
+  const [pendingMove, setPendingMove] = useState<null | {
+    taskId: string;
+    status: TaskStatus;
+    order: number;
+  }>(null);
 
   useEffect(() => {
     loadData<Project>(`http://localhost:3000/projects/${projectId}`)
@@ -79,8 +94,27 @@ export default function ProjectDetailPage() {
     })
   );
 
+  const onConfirmMove = async () => {
+    if (pendingMove) {
+      await handleMove(
+        pendingMove.taskId,
+        pendingMove.status,
+        pendingMove.order,
+        { resumeIfOnHold: true }
+      );
+    }
+    setShowOnHoldModal(false);
+  };
+
+  const onCancelMove = () => {
+    setPendingMove(null);
+    setShowOnHoldModal(false);
+    setTasks(preDragTasksRef.current ?? tasks);
+    console.log("cancel");
+  };
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
+    preDragTasksRef.current = tasks;
   };
 
   const handleDragOver = (event: DragOverEvent) => {
@@ -121,6 +155,7 @@ export default function ProjectDetailPage() {
       over: event.over ? String(event.over.id) : null,
     });
     const { active, over } = event;
+
     setActiveId(null);
     const activeId = String(active.id);
     const last = lastOverIdRef.current;
@@ -146,6 +181,10 @@ export default function ProjectDetailPage() {
     const destList = getVirtualDestList(tasks, destStatus, activeId);
     const destIndex = getDestIndex(destType, overId, destList);
     const newOrder = getNewOrder(destList, destIndex);
+    const intent: TaskMutationIntent = {
+      type: "move",
+      toStatus: destStatus,
+    };
 
     setTasks((prev) =>
       prev.map((task) => {
@@ -154,28 +193,47 @@ export default function ProjectDetailPage() {
       })
     );
 
-    console.log("OVER_ID", overId);
-    console.log("DEST_TYPE", destType);
-    console.log("DEST_INDEX", destIndex, "DESTLIST_LENG", destList.length);
-
-    await handleMove(activeId, destStatus, newOrder);
-    // reset for next drag
-    lastOverIdRef.current = null;
-
-    console.log("DRAG_END", {
-      activeId,
-      overId,
-      last,
-      rawOver: over?.id ? String(over.id) : null,
+    const shouldGate = isOnHoldProj({
+      projectStatus: project?.status as ProjectStatus,
+      intent,
     });
-    return;
+    if (shouldGate) {
+      // 1. remember what the user tried to do
+      setPendingMove({
+        taskId: activeId,
+        status: destStatus,
+        order: newOrder,
+      });
+
+      // 2. show modal
+      setShowOnHoldModal(true);
+      return;
+    } else {
+      console.log("OVER_ID", overId);
+      console.log("DEST_TYPE", destType);
+      console.log("DEST_INDEX", destIndex, "DESTLIST_LENG", destList.length);
+
+      await handleMove(activeId, destStatus, newOrder);
+      // reset for next drag
+      lastOverIdRef.current = null;
+
+      console.log("DRAG_END", {
+        activeId,
+        overId,
+        last,
+        rawOver: over?.id ? String(over.id) : null,
+      });
+      return;
+    }
   };
 
   const handleMove = async (
     taskId: string,
     status: TaskStatus,
-    order: number
+    order: number,
+    opts?: { resumeIfOnHold: boolean }
   ) => {
+    if (opts && !opts.resumeIfOnHold) return;
     setMovingTaskId(taskId);
     try {
       const updated = await moveTask(taskId, status, order);
@@ -183,6 +241,11 @@ export default function ProjectDetailPage() {
         prev.map((task) => (task.id === taskId ? updated : task))
       );
     } catch (err) {
+      if (isOnHoldRequiredError(err)) {
+        setPendingMove({ taskId, status, order });
+        setShowOnHoldModal(true);
+        return;
+      }
       console.error("Failed to move task", err);
     } finally {
       setMovingTaskId(null);
@@ -246,6 +309,13 @@ export default function ProjectDetailPage() {
 
   return (
     <PageContainer>
+      {showOnHoldModal && (
+        <OnHoldModal
+          onClose={onCancelMove}
+          onCancel={onCancelMove}
+          onConfirm={onConfirmMove}
+        />
+      )}
       <div className={`${STYLES.flexCenter} mb-6`}>
         <PageTitle>{project.name}</PageTitle>
 
