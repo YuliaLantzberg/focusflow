@@ -1,11 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { MoveTaskDto } from './dto/move-task.dto';
-import { Task, TaskStatus } from '@prisma/client';
+import { ProjectStatus, Task, TaskStatus } from '@prisma/client';
 import { ProjectTasksService } from 'src/projectTasks/projectTasks.service';
+import { PROJECT_STATUSES } from '@/app/types/project';
 
 @Injectable()
 export class TasksService {
@@ -107,7 +112,7 @@ export class TasksService {
   }
 
   async move(movingTaskId: string, moveTaskDto: MoveTaskDto) {
-    const { status, order } = moveTaskDto;
+    const { status, order, opts } = moveTaskDto;
     const GAP = 100;
     let gapBelow = 0;
     let gapAbove = 0;
@@ -120,6 +125,23 @@ export class TasksService {
       where: { id: movingTaskId },
     });
     if (!task) return;
+    const project = await this.prisma.project.findUnique({
+      where: { id: task.projectId },
+    });
+
+    if (
+      project?.status &&
+      project.status === ProjectStatus.ON_HOLD &&
+      status !== TaskStatus.BLOCKED &&
+      opts &&
+      !opts?.resumeIfOnHold
+    ) {
+      throw new ConflictException({
+        code: 'PROJECT_ON_HOLD_CONFIRMATION_REQUIRED',
+        message: 'Project is on hold. Confirmation required to continue.',
+      });
+    }
+
     const statusChanged = status !== undefined && status !== task.status;
 
     if (statusChanged && order === undefined)

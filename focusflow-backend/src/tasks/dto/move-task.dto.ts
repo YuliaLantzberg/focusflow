@@ -9,4 +9,7 @@ export class MoveTaskDto {
   @IsOptional()
   @IsNumber()
   order?: number;
+
+  @IsOptional()
+  opts?: { resumeIfOnHold: boolean };
 }
