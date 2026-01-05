@@ -9,11 +9,12 @@ import {
 export async function moveTask(
   taskId: string,
   status: TaskStatus,
-  order: number
+  order: number,
+  opts?: { resumeIfOnHold: boolean }
 ): Promise<Task> {
   const res = await apiFetch(`http://localhost:3000/tasks/${taskId}/move`, {
     method: "PATCH",
-    body: JSON.stringify({ status, order }),
+    body: JSON.stringify({ status, order, opts }),
   });
   if (!res.ok) {
     const errorBody = await res.json();

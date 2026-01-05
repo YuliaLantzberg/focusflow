@@ -9,7 +9,10 @@ export default function NavLink({
   label: string;
 }) {
   const pathname = usePathname();
-  const isActive = pathname === href;
+  const isActive =
+    href === "/projects"
+      ? pathname === "/projects" || pathname.startsWith("/projects/")
+      : pathname === href;
   return (
     <Link
       href={href}

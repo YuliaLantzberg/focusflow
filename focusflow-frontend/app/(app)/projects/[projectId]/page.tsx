@@ -233,10 +233,9 @@ export default function ProjectDetailPage() {
     order: number,
     opts?: { resumeIfOnHold: boolean }
   ) => {
-    if (opts && !opts.resumeIfOnHold) return;
     setMovingTaskId(taskId);
     try {
-      const updated = await moveTask(taskId, status, order);
+      const updated = await moveTask(taskId, status, order, opts);
       setTasks((prev) =>
         prev.map((task) => (task.id === taskId ? updated : task))
       );

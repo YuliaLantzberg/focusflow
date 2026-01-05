@@ -2,13 +2,16 @@
 import { usePathname } from "next/navigation";
 export default function AppTopbar() {
   const pathname = usePathname();
+  // TODO: switch to prefix-based titles when project subroutes are finalized
   const titleMap: Record<string, string> = {
     "/dashboard": "Dashboard",
-    "/projects": "Projects",
-    "/tasks": "Tasks",
+    "/analytics": "Analytics",
+    "/settings": "Settings",
     "/profile": "Profile",
   };
-  const pageTitle = titleMap[pathname] ?? "FocusFlow";
+  const pageTitle = pathname.startsWith("/projects")
+    ? "Projects"
+    : titleMap[pathname] ?? "FocusFlow";
   const today = new Date();
   const formattedDate = today.toLocaleDateString("en-IL", {
     weekday: "short",
