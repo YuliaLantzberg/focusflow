@@ -14,7 +14,7 @@ import Badge from "../_components/badge";
 import { ListItem } from "../_components/list-item";
 import { PageTitle } from "../_components/page-title";
 import { CreateNewButton } from "../_components/buttons/create-new-button";
-import { COLORS } from "@/app/lib/styles";
+import { COLORS, STYLES } from "@/app/lib/styles";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -26,7 +26,7 @@ export default function ProjectsPage() {
   }, []);
   return (
     <PageContainer>
-      <div className="flex items-center justify-between mb-4">
+      <div className={`${STYLES.flexCenter} mb-4`}>
         <PageTitle>Projects</PageTitle>
 
         <CreateNewButton href="/projects/new" label="Create New Project" />
