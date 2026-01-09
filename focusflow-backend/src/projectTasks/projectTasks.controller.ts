@@ -14,6 +14,14 @@ export class ProjectsController {
     return this.tasksService.findAll(id, filter);
   }
 
+  @Get('/count')
+  getProjectsTasksCount(
+    @Param('id') id: string,
+    @Body() filter: GetTasksFilterDto,
+  ) {
+    return this.tasksService.count(id, filter);
+  }
+
   @Post()
   createProjectTask(
     @Param('id') id: string,

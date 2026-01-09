@@ -10,7 +10,6 @@ import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { MoveTaskDto } from './dto/move-task.dto';
 import { ProjectStatus, Task, TaskStatus } from '@prisma/client';
 import { ProjectTasksService } from 'src/projectTasks/projectTasks.service';
-import { PROJECT_STATUSES } from '@/app/types/project';
 
 @Injectable()
 export class TasksService {
@@ -109,6 +108,18 @@ export class TasksService {
       removedTask.projectId,
     );
     return removedTask;
+  }
+
+  async count(projectId: string, filter: GetTasksFilterDto) {
+    const { status, includeHidden } = filter;
+
+    return this.prisma.task.count({
+      where: {
+        ...(projectId && { projectId }),
+        ...(status && { status }),
+        ...(includeHidden ? {} : { isVisible: true }),
+      },
+    });
   }
 
   async move(movingTaskId: string, moveTaskDto: MoveTaskDto) {
