@@ -10,6 +10,7 @@ import {
 } from "@dnd-kit/sortable";
 import ColumnDropZone from "./column-drop-zone";
 import { useDroppable } from "@dnd-kit/core";
+import { getTaskStatusIcon } from "@/app/lib/statusColor";
 
 type KanbanColumnProps = {
   title: string;
@@ -49,7 +50,9 @@ export default function KanbanColumn({
           isOver ? "ring-2 ring-blue-400" : ""
         }`}
       >
-        <CardTitle color={titleColor}>{title}</CardTitle>
+        <CardTitle icon={getTaskStatusIcon(taskStatus)} color={titleColor}>
+          {title}
+        </CardTitle>
         <div className="mt-3 flex flex-col flex-1">
           {tasks.length === 0 && (
             <p className={`text-xs ${COLORS.textMuted} italic`}>

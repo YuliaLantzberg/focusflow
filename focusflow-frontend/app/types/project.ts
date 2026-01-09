@@ -4,10 +4,14 @@ import { TaskStatus } from "./task";
 export interface Project {
   id: string;
   name: string;
-  description?: string | null;
+  description: string;
   status: string;
-  clientCompany?: string | null;
-  dueDate?: string | null;
+  clientCompany: string;
+  clientContactName: string;
+  clientContactEmail: string;
+  clientContactPhone: string;
+  budget: number;
+  dueDate: string | null;
 }
 
 type ColumnConfig = {
@@ -60,3 +64,31 @@ export const PROJECT_STATUSES: ProjectStatusInterface = {
   ON_HOLD: "ON_HOLD",
   ARCHIVED: "ARCHIVED",
 };
+
+export type DueDateStatus = "OVERDUE" | "URGENT" | "SOON" | "LATER" | "NONE";
+
+interface DueDateStatusInterface {
+  OVERDUE: DueDateStatus;
+  URGENT: DueDateStatus;
+  SOON: DueDateStatus;
+  LATER: DueDateStatus;
+  NONE: DueDateStatus;
+}
+
+export const DUEDATE_STATUSES: DueDateStatusInterface = {
+  OVERDUE: "OVERDUE",
+  URGENT: "URGENT",
+  SOON: "SOON",
+  LATER: "LATER",
+  NONE: "NONE",
+};
+
+//Overdue (due date < today): red + label “Overdue”
+
+// Urgent (0–2 days left): red
+
+// Soon (3–7 days left): yellow/amber
+
+// Later (8+ days left): green
+
+// No due date: neutral gray

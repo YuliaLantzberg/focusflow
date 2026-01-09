@@ -56,6 +56,20 @@ import { OnHoldModal } from "../../_components/modals/onHoldModal";
 import Link from "next/link";
 import { formatDate } from "../../../lib/helper";
 import { refreshProject } from "./lib/helper";
+import ColumnProjOverview from "../_components/column-project-overview";
+import {
+  Building2,
+  Building2Icon,
+  BuildingIcon,
+  Hourglass,
+  Mail,
+  Phone,
+  PhoneCall,
+  Wallet,
+  Wallet2,
+} from "lucide-react";
+import DueDate from "../_components/dueDate";
+import Btn from "../../_components/buttons/btn";
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -79,9 +93,13 @@ export default function ProjectDetailPage() {
     status: TaskStatus;
     order: number;
   }>(null);
-  // totalTasks, doneTasks, progressPercent
-  const [totalTasks, setTotalTasks] = useState<number>(tasks.length);
-  const [doneTasks, setDoneTasks] = useState<number>(0);
+
+  const totalTasks = tasks.length;
+  const doneTasks = tasks.filter((t) => t.status === TASK_STATUSES[3]).length; // or TaskStatus.DONE
+  const progressPct =
+    totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+
+  const showProgress = totalTasks > 0 && doneTasks > 0;
 
   const statusMsg =
     project?.status === PROJECT_STATUSES.ON_HOLD
@@ -97,18 +115,6 @@ export default function ProjectDetailPage() {
 
     loadData<Task[]>(`http://localhost:3000/projects/${projectId}/tasks`)
       .then(setTasks)
-      .catch(console.error);
-
-    loadData<number>(
-      `http://localhost:3000/projects/${projectId}/tasks/count`,
-      {
-        method: "GET",
-        body: JSON.stringify({
-          status: TASK_STATUSES_ENUM.DONE,
-        }),
-      }
-    )
-      .then(setDoneTasks)
       .catch(console.error);
   }, [projectId]);
 
@@ -140,6 +146,7 @@ export default function ProjectDetailPage() {
     setTasks(preDragTasksRef.current ?? tasks);
     console.log("cancel");
   };
+
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
     preDragTasksRef.current = [...tasks];
@@ -244,13 +251,6 @@ export default function ProjectDetailPage() {
       await handleMove(activeId, destStatus, newOrder);
       // reset for next drag
       lastOverIdRef.current = null;
-
-      console.log("DRAG_END", {
-        activeId,
-        overId,
-        last,
-        rawOver: over?.id ? String(over.id) : null,
-      });
       return;
     }
   };
@@ -365,18 +365,82 @@ export default function ProjectDetailPage() {
       )}
       <div className="space-y-4">
         <CardShell className={`${SIZES.cardPadding} space-y-3`}>
-          {project.description && (
+          <div className={STYLES.flexCenter}>
+            <CardTitle color="text-white">Project Overview</CardTitle>
+            <div className={`${STYLES.flexCenter} gap-5`}>
+              <Btn
+                data={null}
+                label="Archieve"
+                onClick={() => console.log("Archieve")}
+                bgColor={COLORS.BtnBgColor.secondary}
+              />
+              <CreateNewButton
+                onClick={() =>
+                  console.log("Comming soon modal to edit the project")
+                }
+              >
+                Edit Project
+              </CreateNewButton>
+            </div>
+          </div>
+          {project.description ? (
             <p className="text-gray-300">{project.description}</p>
+          ) : (
+            "No description yet."
           )}
-
-          {(project.clientCompany || project.dueDate) && (
-            <div
-              className={`flex flex-wrap items-center gap-4 text-sm ${COLORS.textSecondary}`}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 divide-x divide-gray-300">
+            <ColumnProjOverview title="Company" icon={Building2}>
+              {project.clientCompany}
+            </ColumnProjOverview>
+            <ColumnProjOverview
+              title="Contact"
+              icon={PhoneCall}
+              className={`gap-4`}
             >
-              {project.clientCompany && <p>Client: {project.clientCompany}</p>}
-              {project.dueDate && (
-                <p>Due date: {formatDate(project.dueDate)}</p>
+              {project.clientContactName}
+              <div className={`${STYLES.flexCenter} flex-col gap-4`}>
+                <a
+                  href={"tel:" + project.clientContactPhone}
+                  className={`flex items-center gap-2`}
+                >
+                  <Phone />
+                  {project.clientContactPhone}
+                </a>
+                <a
+                  href={"mailto:" + project.clientContactEmail}
+                  className={`flex items-center gap-2`}
+                >
+                  <Mail />
+                  {project.clientContactEmail}
+                </a>
+              </div>
+            </ColumnProjOverview>
+            <ColumnProjOverview title="Budget" icon={Wallet}>
+              {project.budget ? (
+                <p>{Number(project.budget).toFixed(2)}$</p>
+              ) : (
+                <p> --- </p>
               )}
+            </ColumnProjOverview>
+            <ColumnProjOverview title="Deadline" icon={Hourglass}>
+              <DueDate targetDate={project.dueDate} />
+            </ColumnProjOverview>
+          </div>
+          {showProgress && (
+            <div className="space-y-2 pt-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className={COLORS.textSecondary}>Progress</span>
+                <span className={COLORS.textSecondary}>
+                  {doneTasks}/{totalTasks} done ({progressPct}%)
+                </span>
+              </div>
+
+              <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-slate-300 transition-all"
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
             </div>
           )}
         </CardShell>

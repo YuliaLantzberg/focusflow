@@ -28,6 +28,7 @@ export function OnHoldModal({ onCancel, onConfirm, onClose }: onHoldProps) {
                 onClick={onConfirm}
                 label="Confirm"
                 bgColor={COLORS.BtnBgColor.primary}
+                size="w-3xl"
               />
               <Btn
                 data={false}

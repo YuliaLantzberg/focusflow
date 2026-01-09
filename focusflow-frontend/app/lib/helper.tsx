@@ -6,3 +6,16 @@ export function formatDate(dateString: string): string {
     day: "numeric",
   });
 }
+
+export function calcDaysDifference(
+  targetDate: Date,
+  anchorDate = new Date()
+): number {
+  anchorDate.setHours(0, 0, 0, 0);
+  targetDate.setHours(0, 0, 0, 0);
+  // Calculate the difference in milliseconds
+  const timeDifference: number = targetDate.getTime() - anchorDate.getTime();
+  // Convert milliseconds to days (1000ms * 60s * 60m * 24h = 86400000ms per day).
+  const daysDifference: number = timeDifference / (1000 * 60 * 60 * 24);
+  return Math.round(daysDifference);
+}

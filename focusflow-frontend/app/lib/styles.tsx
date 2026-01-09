@@ -17,6 +17,7 @@ export const COLORS = {
   BtnBgColor: {
     primary: "bg-emerald-500/50",
     danger: "bg-red-400/80",
+    secondary: "bg-slate-800",
   },
 
   statusText: {

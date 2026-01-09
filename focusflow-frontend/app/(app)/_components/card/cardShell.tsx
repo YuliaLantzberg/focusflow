@@ -11,7 +11,6 @@ export function CardShell({ children, className }: CardShellProps) {
     <div
       className={`
         rounded-lg border ${COLORS.border} ${COLORS.surface}
-        ${COLORS.surfaceHover} transition
         ${className ?? ""}
       `}
     >
