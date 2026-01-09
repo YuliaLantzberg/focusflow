@@ -21,12 +21,13 @@ import { loadData } from "@/app/lib/apiClient";
 import { getProjectStatusColor } from "@/app/lib/statusColor";
 import { createTask, isOnHoldRequiredError, moveTask } from "@/app/lib/tasks";
 
-import { Project } from "@/app/types/project";
+import { Project, PROJECT_STATUSES } from "@/app/types/project";
 import {
   Task,
   TaskStatus,
   TASK_STATUSES,
   TaskMutationIntent,
+  TASK_STATUSES_ENUM,
 } from "@/app/types/task";
 import { PROJECT_TASK_COLUMNS } from "@/app/types/project";
 
@@ -52,6 +53,9 @@ import {
 import { isOnHoldProj } from "../../lib/helper";
 import { ProjectStatus } from "../../../types/project";
 import { OnHoldModal } from "../../_components/modals/onHoldModal";
+import Link from "next/link";
+import { formatDate } from "../../../lib/helper";
+import { refreshProject } from "./lib/helper";
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -75,6 +79,16 @@ export default function ProjectDetailPage() {
     status: TaskStatus;
     order: number;
   }>(null);
+  // totalTasks, doneTasks, progressPercent
+  const [totalTasks, setTotalTasks] = useState<number>(tasks.length);
+  const [doneTasks, setDoneTasks] = useState<number>(0);
+
+  const statusMsg =
+    project?.status === PROJECT_STATUSES.ON_HOLD
+      ? "Project is on hold - task changes require confirmation."
+      : project?.status === PROJECT_STATUSES.ARCHIVED
+      ? "Project archived - tasks are read-only."
+      : null;
 
   useEffect(() => {
     loadData<Project>(`http://localhost:3000/projects/${projectId}`)
@@ -84,7 +98,21 @@ export default function ProjectDetailPage() {
     loadData<Task[]>(`http://localhost:3000/projects/${projectId}/tasks`)
       .then(setTasks)
       .catch(console.error);
+
+    loadData<number>(
+      `http://localhost:3000/projects/${projectId}/tasks/count`,
+      {
+        method: "GET",
+        body: JSON.stringify({
+          status: TASK_STATUSES_ENUM.DONE,
+        }),
+      }
+    )
+      .then(setDoneTasks)
+      .catch(console.error);
   }, [projectId]);
+
+  useEffect(() => {});
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -114,7 +142,7 @@ export default function ProjectDetailPage() {
   };
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
-    preDragTasksRef.current = tasks;
+    preDragTasksRef.current = [...tasks];
   };
 
   const handleDragOver = (event: DragOverEvent) => {
@@ -239,6 +267,7 @@ export default function ProjectDetailPage() {
       setTasks((prev) =>
         prev.map((task) => (task.id === taskId ? updated : task))
       );
+      refreshProject(projectId, setProject);
     } catch (err) {
       if (isOnHoldRequiredError(err)) {
         setPendingMove({ taskId, status, order });
@@ -262,7 +291,7 @@ export default function ProjectDetailPage() {
       .sort(
         (a, b) => (a.order ?? 0) - (b.order ?? 0) || a.id.localeCompare(b.id)
       );
-    const maxOrderInTODOColumn = TODOTasks[TODOTasks.length - 1].order;
+    const maxOrder = TODOTasks.length ? TODOTasks.at(-1)?.order ?? 0 : 0;
     setTitleError(null);
     if (!newTitle.trim()) {
       setTitleError("Task title is required");
@@ -273,7 +302,7 @@ export default function ProjectDetailPage() {
       const newTask = await createTask(projectId, {
         title: newTitle,
         description: newDescription,
-        order: maxOrderInTODOColumn + 1000,
+        order: maxOrder + 1000,
         status: TASK_STATUSES[0], //New Task is always in TODO column
       });
       if (newTask) {
@@ -281,6 +310,7 @@ export default function ProjectDetailPage() {
         setNewTitle("");
         setNewDescription("");
       }
+      refreshProject(projectId, setProject);
     } catch (err) {
       console.log(err);
     } finally {
@@ -293,10 +323,12 @@ export default function ProjectDetailPage() {
       prev.map((task) => (task.id === updated.id ? updated : task))
     );
     setSelectedTask(updated);
+    refreshProject(projectId, setProject);
   };
 
   const handleTaskDelete = (deletedId: string) => {
     setTasks((prev) => prev.filter((task) => task.id !== deletedId));
+    refreshProject(projectId, setProject);
   };
 
   if (!project)
@@ -315,7 +347,9 @@ export default function ProjectDetailPage() {
           onConfirm={onConfirmMove}
         />
       )}
-      <div className={`${STYLES.flexCenter} mb-6`}>
+
+      <div className={`${STYLES.flexCenter} gap-15 mb-6 mx-6`}>
+        <Link href={"/projects"}>← Projects</Link>
         <PageTitle>{project.name}</PageTitle>
 
         <Badge
@@ -324,6 +358,11 @@ export default function ProjectDetailPage() {
           className="w-24"
         />
       </div>
+      {statusMsg && (
+        <div className={`${STYLES.flexCenterCenter} mb-6`}>
+          <p className={`${COLORS.textSecondary}`}>{statusMsg}</p>
+        </div>
+      )}
       <div className="space-y-4">
         <CardShell className={`${SIZES.cardPadding} space-y-3`}>
           {project.description && (
@@ -335,7 +374,9 @@ export default function ProjectDetailPage() {
               className={`flex flex-wrap items-center gap-4 text-sm ${COLORS.textSecondary}`}
             >
               {project.clientCompany && <p>Client: {project.clientCompany}</p>}
-              {project.dueDate && <p>Due date: {project.dueDate}</p>}
+              {project.dueDate && (
+                <p>Due date: {formatDate(project.dueDate)}</p>
+              )}
             </div>
           )}
         </CardShell>
@@ -346,7 +387,7 @@ export default function ProjectDetailPage() {
             <CreateNewButton
               onClick={() => setShowCreateTaskForm((prev) => !prev)}
             >
-              {showCreateTaskForm ? "Hide form" : "New Task"}
+              {showCreateTaskForm ? "Close" : "Add Task"}
             </CreateNewButton>
           </div>
           {showCreateTaskForm && (
@@ -423,8 +464,10 @@ export default function ProjectDetailPage() {
         </CardShell>
 
         {/* Notes section */}
-        <CardShell className={`${SIZES.cardPadding} space-y-2`}>
-          <h2 className={`text-lg font-medium ${COLORS.textPrimary}`}>Notes</h2>
+        <CardShell className={`${SIZES.cardPadding} space-y-2 opacity-90`}>
+          <div className={STYLES.flexCenter}>
+            <CardTitle color="text-white">Notes</CardTitle>
+          </div>
           <p className={`text-sm ${COLORS.textSecondary}`}>
             Notes UI coming soon.
           </p>
