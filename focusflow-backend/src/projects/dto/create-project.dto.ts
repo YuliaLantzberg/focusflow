@@ -4,8 +4,6 @@ import {
   IsString,
   MaxLength,
   IsDateString,
-  IsEmail,
-  IsNumberString,
   IsEnum,
 } from 'class-validator';
 import { ProjectStatus } from '@prisma/client';
@@ -14,6 +12,10 @@ export class CreateProjectDto {
   @IsString()
   @MaxLength(100)
   name: string;
+
+  @IsOptional()
+  @IsString()
+  clientId: string;
 
   @IsOptional()
   @IsString()
@@ -27,22 +29,6 @@ export class CreateProjectDto {
   @IsOptional()
   @IsBoolean()
   isVisible?: boolean;
-
-  @IsOptional()
-  @IsString()
-  clientCompany?: string;
-
-  @IsOptional()
-  @IsString()
-  clientContactName?: string;
-
-  @IsOptional()
-  @IsEmail()
-  clientContactEmail?: string;
-
-  @IsOptional()
-  @IsNumberString()
-  clientContactPhone?: string;
 
   @IsOptional()
   @IsDateString()

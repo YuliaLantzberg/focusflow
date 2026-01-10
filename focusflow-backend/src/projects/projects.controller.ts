@@ -8,6 +8,7 @@ import {
   Patch,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
@@ -23,6 +24,8 @@ import { ProjectsService } from './projects.service';
 import { TasksService } from 'src/tasks/tasks.service';
 import { NotesService } from 'src/notes/notes.service';
 
+type AuthReq = { user: { userId: string } };
+
 @UseGuards(JwtAuthGuard)
 @Controller('projects')
 export class ProjectsController {
@@ -32,18 +35,18 @@ export class ProjectsController {
     private readonly notesService: NotesService,
   ) {}
   @Post()
-  create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectsService.create(createProjectDto);
+  create(@Req() req: AuthReq, @Body() createProjectDto: CreateProjectDto) {
+    return this.projectsService.create(req.user.userId, createProjectDto);
   }
 
   @Get()
-  findAll() {
-    return this.projectsService.findAll();
+  findAll(@Req() req: AuthReq) {
+    return this.projectsService.findAll(req.user.userId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.projectsService.findOne(id);
+  findOne(@Req() req: AuthReq, @Param('id') id: string) {
+    return this.projectsService.findOne(req.user.userId, id);
   }
 
   @Get(':id/tasks')
@@ -73,12 +76,16 @@ export class ProjectsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectsService.update(id, updateProjectDto);
+  update(
+    @Req() req: AuthReq,
+    @Param('id') id: string,
+    @Body() updateProjectDto: UpdateProjectDto,
+  ) {
+    return this.projectsService.update(req.user.userId, id, updateProjectDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.projectsService.remove(id);
+  remove(@Req() req: AuthReq, @Param('id') id: string) {
+    return this.projectsService.remove(req.user.userId, id);
   }
 }

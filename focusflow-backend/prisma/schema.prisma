@@ -46,6 +46,7 @@ model User {
   timezone     String?
 
   projects Project[]
+  clients Client[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -54,18 +55,15 @@ model User {
 // A client project the user is working on
 model Project {
   id      String @id @default(cuid())
-  ownerId String?
-  owner   User?   @relation(fields: [ownerId], references: [id])
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+  clientId String? 
+  client Client? @relation(fields: [clientId], references: [id])
 
   name        String
   description String?
   status      ProjectStatus @default(PLANNING)
   isVisible   Boolean       @default(true)
-
-  clientCompany      String?
-  clientContactName  String?
-  clientContactEmail String?
-  clientContactPhone String?
 
   dueDate  DateTime?
   budget   Decimal?  @db.Decimal(10, 2)
@@ -78,6 +76,7 @@ model Project {
   updatedAt DateTime @updatedAt
 
   @@index([ownerId])
+  @@index([clientId])
 }
 
 // A task that belongs to a project
@@ -109,6 +108,28 @@ model Task {
   @@index([projectId])
   @@index([status])
 }
+
+// A client on whose project the user is working on
+model Client {
+  id      String @id @default(cuid())
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  companyName        String
+  notes String?
+
+  contactName  String?
+  email String?
+  phone String?
+
+  projects Project[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+}
+
 
 // Free-form notes per project (no authorId – solo user app)
 model ProjectNote {
