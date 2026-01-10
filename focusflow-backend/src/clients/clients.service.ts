@@ -14,4 +14,18 @@ export class ClientsService {
       },
     });
   }
+
+  async findAll(userId: string) {
+    return this.prisma.client.findMany({
+      where: { ownerId: userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        companyName: true,
+        contactName: true,
+        email: true,
+        phone: true,
+      },
+    });
+  }
 }
