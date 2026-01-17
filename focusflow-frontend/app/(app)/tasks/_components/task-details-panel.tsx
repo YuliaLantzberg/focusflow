@@ -12,7 +12,7 @@ import ModalShell from "../../_components/modal-shell";
 import TextBtn from "../../_components/buttons/text-btn";
 import { COLORS, STYLES } from "@/app/lib/styles";
 
-type TaskDetailsPanel = {
+type TaskDetailsProps = {
   task: Task;
   onClose: () => void;
   onUpdate?: (updated: Task) => void;
@@ -24,7 +24,7 @@ export function TaskDetails({
   onClose,
   onUpdate,
   onDelete,
-}: TaskDetailsPanel) {
+}: TaskDetailsProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [editDescription, setEditDescription] = useState(

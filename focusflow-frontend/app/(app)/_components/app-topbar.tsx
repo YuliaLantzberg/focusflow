@@ -5,6 +5,7 @@ export default function AppTopbar() {
   // TODO: switch to prefix-based titles when project subroutes are finalized
   const titleMap: Record<string, string> = {
     "/dashboard": "Dashboard",
+    "/clients": "Clients",
     "/analytics": "Analytics",
     "/settings": "Settings",
     "/profile": "Profile",

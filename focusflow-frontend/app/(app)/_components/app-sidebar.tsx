@@ -9,6 +9,7 @@ export default function AppSidebar() {
       <nav className="flex flex-col gap-2">
         <NavLink href="/dashboard" label="Dashboard" />
         <NavLink href="/projects" label="Projects" />
+        <NavLink href="/clients" label="Clients" />
         <NavLink href="/analytics" label="Analytics" />
         <NavLink href="/settings" label="Settings" />
       </nav>

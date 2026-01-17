@@ -27,7 +27,6 @@ import {
   TaskStatus,
   TASK_STATUSES,
   TaskMutationIntent,
-  TASK_STATUSES_ENUM,
 } from "@/app/types/task";
 import { PROJECT_TASK_COLUMNS } from "@/app/types/project";
 
@@ -54,22 +53,19 @@ import { isOnHoldProj } from "../../lib/helper";
 import { ProjectStatus } from "../../../types/project";
 import { OnHoldModal } from "../../_components/modals/onHoldModal";
 import Link from "next/link";
-import { formatDate } from "../../../lib/helper";
 import { refreshProject } from "./lib/helper";
 import ColumnProjOverview from "../_components/column-project-overview";
 import {
   Building2,
-  Building2Icon,
-  BuildingIcon,
   Hourglass,
   Mail,
   Phone,
   PhoneCall,
   Wallet,
-  Wallet2,
 } from "lucide-react";
 import DueDate from "../_components/dueDate";
 import Btn from "../../_components/buttons/btn";
+import { EditProjectModal } from "../_components/modals/edit-project-modal";
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -84,6 +80,7 @@ export default function ProjectDetailPage() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [showOnHoldModal, setShowOnHoldModal] = useState<boolean>(false);
+  const [showEditProjectModal, setEditProjectModal] = useState<boolean>(false);
   const measuring = { droppable: { strategy: MeasuringStrategy.Always } };
   const activeTask = activeId ? tasks.find((t) => t.id === activeId) : null;
   const lastOverIdRef = useRef<string | null>(null);
@@ -117,8 +114,6 @@ export default function ProjectDetailPage() {
       .then(setTasks)
       .catch(console.error);
   }, [projectId]);
-
-  useEffect(() => {});
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -244,10 +239,6 @@ export default function ProjectDetailPage() {
       setShowOnHoldModal(true);
       return;
     } else {
-      console.log("OVER_ID", overId);
-      console.log("DEST_TYPE", destType);
-      console.log("DEST_INDEX", destIndex, "DESTLIST_LENG", destList.length);
-
       await handleMove(activeId, destStatus, newOrder);
       // reset for next drag
       lastOverIdRef.current = null;
@@ -348,6 +339,13 @@ export default function ProjectDetailPage() {
         />
       )}
 
+      {showEditProjectModal && (
+        <EditProjectModal
+          project={project}
+          onClose={() => setEditProjectModal(false)}
+        />
+      )}
+
       <div className={`${STYLES.flexCenter} gap-15 mb-6 mx-6`}>
         <Link href={"/projects"}>← Projects</Link>
         <PageTitle>{project.name}</PageTitle>
@@ -374,11 +372,7 @@ export default function ProjectDetailPage() {
                 onClick={() => console.log("Archieve")}
                 bgColor={COLORS.BtnBgColor.secondary}
               />
-              <CreateNewButton
-                onClick={() =>
-                  console.log("Comming soon modal to edit the project")
-                }
-              >
+              <CreateNewButton onClick={() => setEditProjectModal(true)}>
                 Edit Project
               </CreateNewButton>
             </div>
@@ -390,28 +384,28 @@ export default function ProjectDetailPage() {
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 divide-x divide-gray-300">
             <ColumnProjOverview title="Company" icon={Building2}>
-              {project.clientCompany}
+              {project.client.companyName}
             </ColumnProjOverview>
             <ColumnProjOverview
               title="Contact"
               icon={PhoneCall}
               className={`gap-4`}
             >
-              {project.clientContactName}
+              {project.client.contactName}
               <div className={`${STYLES.flexCenter} flex-col gap-4`}>
                 <a
-                  href={"tel:" + project.clientContactPhone}
+                  href={"tel:" + project.client.phone}
                   className={`flex items-center gap-2`}
                 >
                   <Phone />
-                  {project.clientContactPhone}
+                  {project.client.phone}
                 </a>
                 <a
-                  href={"mailto:" + project.clientContactEmail}
+                  href={"mailto:" + project.client.email}
                   className={`flex items-center gap-2`}
                 >
                   <Mail />
-                  {project.clientContactEmail}
+                  {project.client.email}
                 </a>
               </div>
             </ColumnProjOverview>

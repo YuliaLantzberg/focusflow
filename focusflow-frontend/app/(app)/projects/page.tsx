@@ -15,6 +15,7 @@ import { ListItem } from "../_components/list-item";
 import { PageTitle } from "../_components/page-title";
 import { CreateNewButton } from "../_components/buttons/create-new-button";
 import { COLORS, STYLES } from "@/app/lib/styles";
+import { formatDate } from "@/app/lib/helper";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -54,12 +55,14 @@ export default function ProjectsPage() {
                 {project.description && (
                   <p className="text-gray-300">{project.description}</p>
                 )}
-                {(project.clientCompany || project.dueDate) && (
+                {project.dueDate && (
                   <div
                     className={`flex flex-wrap items-center gap-4 text-sm ${COLORS.textSecondary}`}
                   >
-                    {project.clientCompany && <p>{project.clientCompany}</p>}
-                    {project.dueDate && <p>Due Date: {project.dueDate}</p>}
+                    {/* {project.clientCompany && <p>{project.clientCompany}</p>} */}
+                    {project.dueDate && (
+                      <p>Due Date: {formatDate(project.dueDate)}</p>
+                    )}
                   </div>
                 )}
               </div>

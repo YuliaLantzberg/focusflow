@@ -6,10 +6,12 @@ export interface Project {
   name: string;
   description: string;
   status: string;
-  clientCompany: string;
-  clientContactName: string;
-  clientContactEmail: string;
-  clientContactPhone: string;
+  client: {
+    companyName: string;
+    contactName: string;
+    email: string;
+    phone: string;
+  };
   budget: number;
   dueDate: string | null;
 }
@@ -83,12 +85,10 @@ export const DUEDATE_STATUSES: DueDateStatusInterface = {
   NONE: "NONE",
 };
 
-//Overdue (due date < today): red + label “Overdue”
-
-// Urgent (0–2 days left): red
-
-// Soon (3–7 days left): yellow/amber
-
-// Later (8+ days left): green
-
-// No due date: neutral gray
+export type CreateProjectPayload = {
+  title: string;
+  description?: string;
+  dueDate?: string;
+  budget: number;
+  status: ProjectStatus;
+};
