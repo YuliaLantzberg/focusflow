@@ -12,7 +12,7 @@ export interface Project {
     email: string;
     phone: string;
   };
-  budget: number;
+  budget: string;
   dueDate: string | null;
 }
 
@@ -89,6 +89,6 @@ export type CreateProjectPayload = {
   title: string;
   description?: string;
   dueDate?: string;
-  budget: number;
+  budget: string;
   status: ProjectStatus;
 };
