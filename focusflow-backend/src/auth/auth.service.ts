@@ -44,12 +44,18 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const user = await this.usersService.findByEmail(loginDto.email);
+    console.log('login email:', loginDto.email);
+    console.log('found user?', !!user, user?.email);
+
     if (!user) {
       throw new UnauthorizedException(
         'The email or password you entered is incorrect.',
       );
     }
-
+    console.log(
+      'bcrypt compare:',
+      await bcrypt.compare(loginDto.password, user.passwordHash),
+    );
     const isValid = await bcrypt.compare(loginDto.password, user.passwordHash);
     if (!isValid)
       throw new UnauthorizedException(

@@ -38,7 +38,6 @@ export class ProjectTasksService {
         data: { status: updatedStatus },
       });
     }
-    console.log(updatedStatus);
     return updatedStatus;
   }
 
@@ -46,7 +45,6 @@ export class ProjectTasksService {
     currentProjectStatus: ProjectStatus,
     counts: { total: number; inProgress: number; done: number },
   ): ProjectStatus {
-    console.log(counts);
     let finalProjStatus = currentProjectStatus;
     if (currentProjectStatus === ProjectStatus.ARCHIVED)
       finalProjStatus = ProjectStatus.ARCHIVED;
@@ -60,6 +58,32 @@ export class ProjectTasksService {
         finalProjStatus = ProjectStatus.ON_HOLD;
       else finalProjStatus = ProjectStatus.PLANNING;
     }
+    return finalProjStatus;
+  }
+
+  async getProjStatusBeforeOnHold(projectId: string) {
+    const countsFilter = { projectId, isVisible: true };
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+    });
+    if (!project) return;
+    const total = await this.prisma.task.count({
+      where: countsFilter,
+    });
+
+    const inProgress = await this.prisma.task.count({
+      where: { ...countsFilter, status: TaskStatus.IN_PROGRESS },
+    });
+    const done = await this.prisma.task.count({
+      where: { ...countsFilter, status: TaskStatus.DONE },
+    });
+
+    let finalProjStatus: ProjectStatus = ProjectStatus.PLANNING;
+    // If all tasks have completed status
+    if (total > 0 && done === total) finalProjStatus = ProjectStatus.COMPLETED;
+    // If any task is in progress
+    else if (inProgress > 0) finalProjStatus = ProjectStatus.ACTIVE;
+    else finalProjStatus = ProjectStatus.PLANNING;
     return finalProjStatus;
   }
 }

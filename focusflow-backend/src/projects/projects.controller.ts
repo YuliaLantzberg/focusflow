@@ -76,12 +76,14 @@ export class ProjectsController {
   }
 
   @Patch(':id')
-  update(
-    @Req() req: AuthReq,
-    @Param('id') id: string,
-    @Body() updateProjectDto: UpdateProjectDto,
-  ) {
-    return this.projectsService.update(req.user.userId, id, updateProjectDto);
+  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
+    console.log('DTO:', updateProjectDto);
+    return this.projectsService.update(id, updateProjectDto);
+  }
+
+  @Patch(':id/status-update')
+  statusUpdate(@Param('id') id: string) {
+    return this.projectsService.updateProjectStatus(id);
   }
 
   @Delete(':id')

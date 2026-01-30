@@ -2,10 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { ProjectTasksService } from 'src/projectTasks/projectTasks.service';
 
 @Injectable()
 export class ProjectsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly projectTasksService: ProjectTasksService,
+  ) {}
 
   async create(userId: string, createProjectDto: CreateProjectDto) {
     const { clientId } = createProjectDto;
@@ -53,16 +57,17 @@ export class ProjectsService {
     });
   }
 
-  async update(userId: string, id: string, updateProjectDto: UpdateProjectDto) {
+  async update(id: string, updateProjectDto: UpdateProjectDto) {
+    console.log('Update Project');
     const project = await this.prisma.project.findFirst({
-      where: { id, ownerId: userId, isVisible: true },
+      where: { id, isVisible: true },
       select: { id: true },
     });
     if (!project) throw new NotFoundException('Project not found');
     const { clientId, ...data } = updateProjectDto;
     if (clientId) {
       const client = await this.prisma.client.findFirst({
-        where: { id: clientId, ownerId: userId },
+        where: { id: clientId },
         select: { id: true },
       });
       if (!client) throw new NotFoundException('Client not found');
@@ -83,5 +88,9 @@ export class ProjectsService {
         isVisible: false,
       },
     });
+  }
+
+  async updateProjectStatus(projectId: string) {
+    return this.projectTasksService.recalcAndPersistProjectStatus(projectId);
   }
 }

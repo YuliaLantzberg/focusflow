@@ -18,7 +18,7 @@ async function main() {
   await prisma.user.deleteMany();
 
   const SEED_EMAIL = 'testuser@example.com';
-  const SEED_PASSWORD = 'Test1234!';
+  const SEED_PASSWORD = `Test1234!`;
 
   const passwordHash = await bcrypt.hash(SEED_PASSWORD, saltRounds);
 
