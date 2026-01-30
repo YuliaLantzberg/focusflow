@@ -4,7 +4,7 @@ import FormCard from "@/app/(app)/_components/forms/form-card";
 import { FormField } from "@/app/(app)/_components/forms/form-field";
 import ModalShell from "@/app/(app)/_components/modal-shell";
 import { formatDate } from "@/app/lib/helper";
-import { updateProject } from "@/app/lib/projects";
+import { getProjStatusNoOnHold, updateProject } from "@/app/lib/projects";
 import { getProjectStatusColor } from "@/app/lib/statusColor";
 import { STYLES } from "@/app/lib/styles";
 import { Project, PROJECT_STATUSES } from "@/app/types/project";
@@ -19,10 +19,10 @@ export function EditProjectModal({ onClose, project }: EditProjectProps) {
   const [editTitle, setEditTitle] = useState(project.name);
   const [editDescription, setEditDescription] = useState(project.description);
   const [isOnHold, setIsOnHold] = useState(
-    project.status === PROJECT_STATUSES.ON_HOLD
+    project.status === PROJECT_STATUSES.ON_HOLD,
   );
   const [editBudget, setEditBudget] = useState(
-    project.budget != null ? String(project.budget) : ""
+    project.budget != null ? String(project.budget) : "",
   );
   const [editDueDate, setEditDueDate] = useState(project.dueDate);
   const [isSaving, setIsSaving] = useState(false);
@@ -31,7 +31,7 @@ export function EditProjectModal({ onClose, project }: EditProjectProps) {
     e.preventDefault();
     setIsSaving(true);
 
-    const budgetNumber = editBudget?.trim() === "" ? null : Number(editBudget);
+    const budgetNumber = editBudget?.trim();
     // optionally guard:
     if (budgetNumber !== null && Number.isNaN(budgetNumber)) {
       setIsSaving(false);
@@ -40,9 +40,9 @@ export function EditProjectModal({ onClose, project }: EditProjectProps) {
     // patchProject({ budget: budgetNumber, ... })
     try {
       const payload = {
-        title: editTitle,
+        name: editTitle.trim(),
         description: editDescription || undefined,
-        budget: Number(editBudget) || 0,
+        budget: budgetNumber || undefined,
         status: projStatus,
         dueDate: editDueDate || undefined,
       };
@@ -55,12 +55,21 @@ export function EditProjectModal({ onClose, project }: EditProjectProps) {
       setIsSaving(false);
     }
   };
-  const handleStatusChange = (onHold: boolean) => {
-    setIsOnHold(onHold);
-    if (projStatus === PROJECT_STATUSES.ON_HOLD && !onHold)
-      setProjStatus(project.status);
-    else if (projStatus !== PROJECT_STATUSES.ON_HOLD && onHold)
+
+  const handleProjStatus = async (isOnHoldChecked: boolean) => {
+    if (isOnHoldChecked) {
+      setIsOnHold(true);
       setProjStatus(PROJECT_STATUSES.ON_HOLD);
+    } else {
+      // if project status initially was On Hold calculate the proj status from tasks. Otherwise assign initial status of the project
+      if (project.status === PROJECT_STATUSES.ON_HOLD) {
+        const updatedStatus = await getProjStatusNoOnHold(project.id);
+        console.log(updatedStatus);
+        setProjStatus(updatedStatus);
+      } else {
+        setProjStatus(project.status);
+      }
+    }
   };
 
   return (
@@ -99,12 +108,12 @@ export function EditProjectModal({ onClose, project }: EditProjectProps) {
                   id="switch-component"
                   type="checkbox"
                   checked={isOnHold}
-                  onChange={(e) => handleStatusChange(e.target.checked)}
-                  className="peer appearance-none w-11 h-5 bg-slate-100 rounded-full checked:bg-slate-800 cursor-pointer transition-colors duration-300"
+                  onChange={(e) => handleProjStatus(e.target.checked)}
+                  className={`peer appearance-none w-11 h-5 bg-slate-100 rounded-full checked:${getProjectStatusColor(PROJECT_STATUSES.ON_HOLD)} cursor-pointer transition-colors duration-300`}
                 />
                 <label
                   htmlFor="switch-component"
-                  className="absolute top-0 left-0 w-5 h-5 bg-slate-500 rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-6 peer-checked:border-slate-800 cursor-pointer"
+                  className={`absolute top-0 left-0 w-5 h-5 bg-slate-500 rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-6 peer-checked:${getProjectStatusColor(PROJECT_STATUSES.ON_HOLD)} cursor-pointer`}
                 ></label>
               </div>
             </div>
