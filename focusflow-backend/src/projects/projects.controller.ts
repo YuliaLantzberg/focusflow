@@ -23,6 +23,7 @@ import { CreateTaskDto } from 'src/tasks/dto/create-task.dto';
 import { ProjectsService } from './projects.service';
 import { TasksService } from 'src/tasks/tasks.service';
 import { NotesService } from 'src/notes/notes.service';
+import { ProjectTasksService } from '../projectTasks/projectTasks.service';
 
 type AuthReq = { user: { userId: string } };
 
@@ -31,6 +32,7 @@ type AuthReq = { user: { userId: string } };
 export class ProjectsController {
   constructor(
     private readonly projectsService: ProjectsService,
+    private readonly projectTasksService: ProjectTasksService,
     private readonly tasksService: TasksService,
     private readonly notesService: NotesService,
   ) {}
@@ -60,6 +62,11 @@ export class ProjectsController {
     @Body() createTaskDto: CreateTaskDto,
   ) {
     return this.tasksService.create(id, createTaskDto);
+  }
+
+  @Get(':id/tasks/proj-status-no-onhold')
+  getProjectInitialStatus(@Param('id') id: string) {
+    return this.projectTasksService.getProjStatusBeforeOnHold(id);
   }
 
   @Get(':id/notes')

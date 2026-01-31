@@ -84,6 +84,6 @@ export class ProjectTasksService {
     // If any task is in progress
     else if (inProgress > 0) finalProjStatus = ProjectStatus.ACTIVE;
     else finalProjStatus = ProjectStatus.PLANNING;
-    return finalProjStatus;
+    return { status: finalProjStatus };
   }
 }
