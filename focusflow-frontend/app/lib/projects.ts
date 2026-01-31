@@ -69,7 +69,10 @@ export async function getProjStatusNoOnHold(
     },
   );
   if (!res.ok) {
+    const text = await res.text();
+    console.error("GET/proj-status-no-onhold:", res.status, text);
     throw new Error(`Failed to update task ${projectId}: ${res.status}`);
   }
-  return res.json();
+  const data = await res.json();
+  return data.status;
 }

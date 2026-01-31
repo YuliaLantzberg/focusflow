@@ -27,6 +27,7 @@ export function EditProjectModal({ onClose, project }: EditProjectProps) {
   const [editDueDate, setEditDueDate] = useState(project.dueDate);
   const [isSaving, setIsSaving] = useState(false);
   const [projStatus, setProjStatus] = useState(project.status);
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -57,6 +58,8 @@ export function EditProjectModal({ onClose, project }: EditProjectProps) {
   };
 
   const handleProjStatus = async (isOnHoldChecked: boolean) => {
+    console.log("isOnHoldChecked", isOnHoldChecked);
+    setIsOnHold(isOnHoldChecked);
     if (isOnHoldChecked) {
       setIsOnHold(true);
       setProjStatus(PROJECT_STATUSES.ON_HOLD);
@@ -64,7 +67,7 @@ export function EditProjectModal({ onClose, project }: EditProjectProps) {
       // if project status initially was On Hold calculate the proj status from tasks. Otherwise assign initial status of the project
       if (project.status === PROJECT_STATUSES.ON_HOLD) {
         const updatedStatus = await getProjStatusNoOnHold(project.id);
-        console.log(updatedStatus);
+        console.log("updatedStatus: ", updatedStatus);
         setProjStatus(updatedStatus);
       } else {
         setProjStatus(project.status);
@@ -90,8 +93,8 @@ export function EditProjectModal({ onClose, project }: EditProjectProps) {
             <p className={`${STYLES.flexCenter}`}>
               Current status:{" "}
               <Badge
-                label={`${projStatus}`}
-                colorClass={`${getProjectStatusColor(projStatus)}`}
+                label={`${project.status}`}
+                colorClass={`${getProjectStatusColor(project.status)}`}
               />
             </p>
             <div className={`${STYLES.flexCenter} gap-4 mt-5`}>
@@ -109,11 +112,13 @@ export function EditProjectModal({ onClose, project }: EditProjectProps) {
                   type="checkbox"
                   checked={isOnHold}
                   onChange={(e) => handleProjStatus(e.target.checked)}
-                  className={`peer appearance-none w-11 h-5 bg-slate-100 rounded-full checked:${getProjectStatusColor(PROJECT_STATUSES.ON_HOLD)} cursor-pointer transition-colors duration-300`}
+                  className="peer sr-only"
                 />
+                {/* Track */}
+                <div className="w-11 h-5 rounded-full bg-slate-800/40 border border-slate-700 transition-colors" />
                 <label
                   htmlFor="switch-component"
-                  className={`absolute top-0 left-0 w-5 h-5 bg-slate-500 rounded-full border border-slate-300 shadow-sm transition-transform duration-300 peer-checked:translate-x-6 peer-checked:${getProjectStatusColor(PROJECT_STATUSES.ON_HOLD)} cursor-pointer`}
+                  className={`absolute left-0 top-0 h-5 w-5 rounded-full border shadow-sm cursor-pointer transition-all duration-300 bg-slate-500 border-slate-300 peer-checked:translate-x-6 peer-checked:${getProjectStatusColor(PROJECT_STATUSES.ON_HOLD)}`}
                 ></label>
               </div>
             </div>
