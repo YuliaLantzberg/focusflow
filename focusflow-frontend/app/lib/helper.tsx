@@ -7,9 +7,14 @@ export function formatDate(dateString: string): string {
   });
 }
 
+// for <input type="date">
+export function toDateInputValue(dateString: string): string {
+  return new Date(dateString).toISOString().slice(0, 10);
+}
+
 export function calcDaysDifference(
   targetDate: Date,
-  anchorDate = new Date()
+  anchorDate = new Date(),
 ): number {
   anchorDate.setHours(0, 0, 0, 0);
   targetDate.setHours(0, 0, 0, 0);

@@ -3,7 +3,7 @@ import SubmitButton from "@/app/(app)/_components/buttons/submit-button";
 import FormCard from "@/app/(app)/_components/forms/form-card";
 import { FormField } from "@/app/(app)/_components/forms/form-field";
 import ModalShell from "@/app/(app)/_components/modal-shell";
-import { formatDate } from "@/app/lib/helper";
+import { formatDate, toDateInputValue } from "@/app/lib/helper";
 import { getProjStatusNoOnHold, updateProject } from "@/app/lib/projects";
 import { getProjectStatusColor } from "@/app/lib/statusColor";
 import { STYLES } from "@/app/lib/styles";
@@ -24,10 +24,16 @@ export function EditProjectModal({ onClose, project }: EditProjectProps) {
   const [editBudget, setEditBudget] = useState(
     project.budget != null ? String(project.budget) : "",
   );
-  const [editDueDate, setEditDueDate] = useState(project.dueDate);
+  const [editDueDate, setEditDueDate] = useState(
+    project.dueDate ? toDateInputValue(project.dueDate) : "",
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [projStatus, setProjStatus] = useState(project.status);
 
+  const dueDateIso =
+    editDueDate !== "" ? new Date(editDueDate).toISOString() : undefined;
+
+  console.log("project", project);
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -45,7 +51,7 @@ export function EditProjectModal({ onClose, project }: EditProjectProps) {
         description: editDescription || undefined,
         budget: budgetNumber || undefined,
         status: projStatus,
-        dueDate: editDueDate || undefined,
+        dueDate: dueDateIso,
       };
       await updateProject(project.id, payload);
       onClose();
@@ -152,13 +158,9 @@ export function EditProjectModal({ onClose, project }: EditProjectProps) {
           <FormField label="Due Date">
             <input
               type="date"
-              value={
-                editDueDate
-                  ? formatDate(editDueDate)
-                  : formatDate(new Date().toString())
-              }
+              value={editDueDate}
               onChange={(e) => setEditDueDate(e.target.value)}
-              className={`${STYLES.form.field}`}
+              className={STYLES.form.field}
             />
           </FormField>
           <SubmitButton disabled={isSaving}>

@@ -102,8 +102,8 @@ export default function ProjectDetailPage() {
     project?.status === PROJECT_STATUSES.ON_HOLD
       ? "Project is on hold - task changes require confirmation."
       : project?.status === PROJECT_STATUSES.ARCHIVED
-      ? "Project archived - tasks are read-only."
-      : null;
+        ? "Project archived - tasks are read-only."
+        : null;
 
   useEffect(() => {
     loadData<Project>(`http://localhost:3000/projects/${projectId}`)
@@ -120,7 +120,7 @@ export default function ProjectDetailPage() {
       activationConstraint: {
         distance: 8, // pixels to move before drag starts
       },
-    })
+    }),
   );
 
   const onConfirmMove = async () => {
@@ -129,7 +129,7 @@ export default function ProjectDetailPage() {
         pendingMove.taskId,
         pendingMove.status,
         pendingMove.order,
-        { resumeIfOnHold: true }
+        { resumeIfOnHold: true },
       );
     }
     setShowOnHoldModal(false);
@@ -220,7 +220,7 @@ export default function ProjectDetailPage() {
       prev.map((task) => {
         if (task.id !== activeId) return task;
         else return { ...task, status: destStatus, order: newOrder };
-      })
+      }),
     );
 
     const shouldGate = isOnHoldProj({
@@ -250,13 +250,13 @@ export default function ProjectDetailPage() {
     taskId: string,
     status: TaskStatus,
     order: number,
-    opts?: { resumeIfOnHold: boolean }
+    opts?: { resumeIfOnHold: boolean },
   ) => {
     setMovingTaskId(taskId);
     try {
       const updated = await moveTask(taskId, status, order, opts);
       setTasks((prev) =>
-        prev.map((task) => (task.id === taskId ? updated : task))
+        prev.map((task) => (task.id === taskId ? updated : task)),
       );
       refreshProject(projectId, setProject);
     } catch (err) {
@@ -280,9 +280,9 @@ export default function ProjectDetailPage() {
     const TODOTasks = tasks
       .filter((task) => task.status === TASK_STATUSES[0])
       .sort(
-        (a, b) => (a.order ?? 0) - (b.order ?? 0) || a.id.localeCompare(b.id)
+        (a, b) => (a.order ?? 0) - (b.order ?? 0) || a.id.localeCompare(b.id),
       );
-    const maxOrder = TODOTasks.length ? TODOTasks.at(-1)?.order ?? 0 : 0;
+    const maxOrder = TODOTasks.length ? (TODOTasks.at(-1)?.order ?? 0) : 0;
     setTitleError(null);
     if (!newTitle.trim()) {
       setTitleError("Task title is required");
@@ -311,7 +311,7 @@ export default function ProjectDetailPage() {
 
   const handleTaskUpdate = (updated: Task) => {
     setTasks((prev) =>
-      prev.map((task) => (task.id === updated.id ? updated : task))
+      prev.map((task) => (task.id === updated.id ? updated : task)),
     );
     setSelectedTask(updated);
     refreshProject(projectId, setProject);
@@ -321,6 +321,8 @@ export default function ProjectDetailPage() {
     setTasks((prev) => prev.filter((task) => task.id !== deletedId));
     refreshProject(projectId, setProject);
   };
+
+  console.log(project);
 
   if (!project)
     return (
@@ -342,7 +344,10 @@ export default function ProjectDetailPage() {
       {showEditProjectModal && (
         <EditProjectModal
           project={project}
-          onClose={() => setEditProjectModal(false)}
+          onClose={() => {
+            setEditProjectModal(false);
+            refreshProject(projectId, setProject);
+          }}
         />
       )}
 
@@ -384,30 +389,36 @@ export default function ProjectDetailPage() {
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 divide-x divide-gray-300">
             <ColumnProjOverview title="Company" icon={Building2}>
-              {project.client.companyName}
+              {project.client ? project.client.companyName : "My Company"}
             </ColumnProjOverview>
             <ColumnProjOverview
               title="Contact"
               icon={PhoneCall}
               className={`gap-4`}
             >
-              {project.client.contactName}
-              <div className={`${STYLES.flexCenter} flex-col gap-4`}>
-                <a
-                  href={"tel:" + project.client.phone}
-                  className={`flex items-center gap-2`}
-                >
-                  <Phone />
-                  {project.client.phone}
-                </a>
-                <a
-                  href={"mailto:" + project.client.email}
-                  className={`flex items-center gap-2`}
-                >
-                  <Mail />
-                  {project.client.email}
-                </a>
-              </div>
+              {project.client ? (
+                <div>
+                  <p>{project.client.contactName}</p>
+                  <div className={`${STYLES.flexCenter} flex-col gap-4`}>
+                    <a
+                      href={"tel:" + project.client.phone}
+                      className={`flex items-center gap-2`}
+                    >
+                      <Phone />
+                      {project.client.phone}
+                    </a>
+                    <a
+                      href={"mailto:" + project.client.email}
+                      className={`flex items-center gap-2`}
+                    >
+                      <Mail />
+                      {project.client.email}
+                    </a>
+                  </div>
+                </div>
+              ) : (
+                "My Project"
+              )}
             </ColumnProjOverview>
             <ColumnProjOverview title="Budget" icon={Wallet}>
               {project.budget ? (
@@ -497,7 +508,7 @@ export default function ProjectDetailPage() {
                     .sort(
                       (a, b) =>
                         (a.order ?? 0) - (b.order ?? 0) ||
-                        a.id.localeCompare(b.id)
+                        a.id.localeCompare(b.id),
                     )}
                   onMove={handleMove}
                   movingTaskId={movingTaskId}
