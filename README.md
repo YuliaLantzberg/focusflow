@@ -102,11 +102,12 @@ analytics/
 - Frontend layout & navigation
 - Projects UI
 - Auth UI + Landing page
+- Project status semantics enforcement
 
 **In Progress / Planned**
-- Project status semantics enforcement
 - Dashboard UX & data
 - Notes UI
+- Client UI
 - Task details page
 - Enhanced project & task forms
 - Analytics (time, cost, profit)
