@@ -4,6 +4,10 @@ export function getToken() {
   return token;
 }
 
+export function logout() {
+  localStorage.removeItem("ff_token"); // or your exact key
+}
+
 export async function apiFetch(url: string, options?: RequestInit) {
   const token = getToken();
   const optionsWithToken = {
@@ -20,7 +24,7 @@ export async function apiFetch(url: string, options?: RequestInit) {
 
 export async function loadData<T>(
   url: string,
-  options?: RequestInit
+  options?: RequestInit,
 ): Promise<T> {
   const res = await apiFetch(url, options);
   if (!res.ok) {
