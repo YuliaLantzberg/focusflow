@@ -1,0 +1,17 @@
+Eligible projects: isVisible = true AND status IN (ACTIVE, PLANNING) AND owned by user
+
+Excluded projects: ON_HOLD, COMPLETED, ARCHIVED
+
+Tasks considered for urgency: isVisible = true AND status NOT IN (DONE, ARCHIVED, BLOCKED) AND dueDate != null
+
+Time rules
+
+now is evaluated once per request (server time)
+
+overdue: dueDate < now
+
+due soon: now <= dueDate <= now + 7 days
+
+Tie-break: earliest deciding date → then project.createdAt asc → then project.id asc
+
+No-due tasks: excluded from due-based tiers
