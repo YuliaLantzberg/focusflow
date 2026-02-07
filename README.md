@@ -74,6 +74,13 @@ The application allows users to manage projects and tasks using Kanban-style wor
 - Safe inserts between items
 - Automatic cleanup when gaps shrink or collisions occur
 
+**Time rules (Dashboard)**
+
+- now is evaluated once per request using server time
+- A task or project is overdue if dueDate < now
+- A task or project is due soon if now <= dueDate <= now + 7 days
+- Tasks without dueDate are excluded from due-based tiers
+
 ## Frontend Route Structure (Current)
 app/
 layout.tsx // root layout
