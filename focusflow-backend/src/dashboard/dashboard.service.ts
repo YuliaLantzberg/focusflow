@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ProjectStatus, TaskStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { FOCUSNOW_REASON, Result } from './types';
 
 @Injectable()
 export class DashboardService {
@@ -8,7 +9,8 @@ export class DashboardService {
 
   async getDashboard(userId: string) {
     const now = new Date();
-    const res = {
+
+    const res: Result = {
       generatedAt: now.toISOString(),
       focusNow: {
         project: null,
@@ -91,6 +93,50 @@ export class DashboardService {
       });
     }
 
+    const getTaskSignals = (projectId: string) => {
+      const taskSignals = signals.get(projectId);
+      if (taskSignals) return taskSignals;
+      return {
+        overdueTaskCount: 0,
+        earliestOverdueAt: null,
+        nextTaskDueAt: null,
+      };
+    };
+
+    let bestProject: any = null;
+
+    let bestOverdueDate: Date | null = null;
+
+    eligibleProjects.forEach((proj) => {
+      const taskSignals = getTaskSignals(proj.id);
+      const overdueDate = taskSignals.earliestOverdueAt;
+      if (bestProject === null && overdueDate !== null) {
+        bestProject = proj;
+      } else {
+        if (overdueDate && bestOverdueDate && overdueDate > bestOverdueDate) {
+          bestProject = proj;
+          bestOverdueDate = overdueDate;
+        } else if (overdueDate === bestOverdueDate) {
+          if (bestProject && proj.createdAt < bestProject?.createdAt) {
+            bestProject = proj;
+            bestOverdueDate = overdueDate;
+          } else if (bestProject && proj.createdAt === bestProject.createdAt) {
+            if (proj.id < bestProject?.id) {
+              bestProject = proj;
+              bestOverdueDate = overdueDate;
+            }
+          }
+        }
+      }
+    });
+    if (bestProject !== null) {
+      const taskSignals = getTaskSignals(bestProject.id);
+      res.focusNow.project = bestProject;
+      res.focusNow.reason = FOCUSNOW_REASON.OVERDUE_TASK;
+      res.focusNow.evidence.overdueTaskCount = taskSignals.overdueTaskCount;
+      res.focusNow.evidence.earliestOverdueAt =
+        taskSignals.earliestOverdueAt?.toISOString();
+    }
     return res;
   }
 
