@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ProjectStatus, TaskStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { FOCUSNOW_REASON, Result } from './types';
+import { FOCUSNOW_REASON } from './types';
+import type { ProjectCard, Result, TaskSignals } from './types';
 
 @Injectable()
 export class DashboardService {
@@ -18,7 +19,8 @@ export class DashboardService {
         evidence: {},
       },
     };
-    const eligibleProjects = await this.getEligibleProjects(userId);
+    const eligibleProjects: ProjectCard[] =
+      await this.getEligibleProjects(userId);
     const eligibleProjectsIds = eligibleProjects.map((project) => project.id);
 
     const filter = {
@@ -63,14 +65,7 @@ export class DashboardService {
 
     if (overdueByProject.length === 0 && futureDueDateByProject.length === 0)
       return res;
-    const signals = new Map<
-      string,
-      {
-        overdueTaskCount: number;
-        earliestOverdueAt: Date | null;
-        nextTaskDueAt: Date | null;
-      }
-    >();
+    const signals = new Map<string, TaskSignals>();
 
     for (const row of overdueByProject) {
       signals.set(row.projectId, {
@@ -93,7 +88,7 @@ export class DashboardService {
       });
     }
 
-    const getTaskSignals = (projectId: string) => {
+    const getTaskSignals = (projectId: string): TaskSignals => {
       const taskSignals = signals.get(projectId);
       if (taskSignals) return taskSignals;
       return {
@@ -103,17 +98,22 @@ export class DashboardService {
       };
     };
 
-    let bestProject: any = null;
+    let bestProject: ProjectCard | null = null;
 
     let bestOverdueDate: Date | null = null;
 
-    eligibleProjects.forEach((proj) => {
+    for (const proj of eligibleProjects) {
       const taskSignals = getTaskSignals(proj.id);
       const overdueDate = taskSignals.earliestOverdueAt;
       if (bestProject === null && overdueDate !== null) {
         bestProject = proj;
+        bestOverdueDate = overdueDate;
       } else {
-        if (overdueDate && bestOverdueDate && overdueDate > bestOverdueDate) {
+        if (
+          overdueDate !== null &&
+          bestOverdueDate &&
+          overdueDate < bestOverdueDate
+        ) {
           bestProject = proj;
           bestOverdueDate = overdueDate;
         } else if (overdueDate === bestOverdueDate) {
@@ -128,7 +128,7 @@ export class DashboardService {
           }
         }
       }
-    });
+    }
     if (bestProject !== null) {
       const taskSignals = getTaskSignals(bestProject.id);
       res.focusNow.project = bestProject;
@@ -140,7 +140,7 @@ export class DashboardService {
     return res;
   }
 
-  async getEligibleProjects(userId: string) {
+  async getEligibleProjects(userId: string): Promise<ProjectCard[]> {
     return this.prisma.project.findMany({
       where: {
         ownerId: userId,
