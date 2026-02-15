@@ -10,6 +10,7 @@ export class DashboardService {
 
   async getDashboard(userId: string) {
     const now = new Date();
+    const dueSoonLimit = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     const res: Result = {
       generatedAt: now.toISOString(),
@@ -62,9 +63,6 @@ export class DashboardService {
         dueDate: true,
       },
     });
-
-    if (overdueByProject.length === 0 && futureDueDateByProject.length === 0)
-      return res;
     const signals = new Map<string, TaskSignals>();
 
     for (const row of overdueByProject) {
@@ -102,6 +100,10 @@ export class DashboardService {
 
     let bestOverdueDate: Date | null = null;
 
+    let bestDueSoonProject: ProjectCard | null = null;
+
+    let bestNextDueDate: Date | null = null;
+
     for (const proj of eligibleProjects) {
       const taskSignals = getTaskSignals(proj.id);
       const overdueDate = taskSignals.earliestOverdueAt;
@@ -129,6 +131,7 @@ export class DashboardService {
         }
       }
     }
+
     if (bestProject !== null) {
       const taskSignals = getTaskSignals(bestProject.id);
       res.focusNow.project = bestProject;
@@ -136,7 +139,45 @@ export class DashboardService {
       res.focusNow.evidence.overdueTaskCount = taskSignals.overdueTaskCount;
       res.focusNow.evidence.earliestOverdueAt =
         taskSignals.earliestOverdueAt?.toISOString();
+      return res;
+    } else {
+      for (const proj of eligibleProjects) {
+        const nextTaskDueAt = getTaskSignals(proj.id).nextTaskDueAt;
+        if (nextTaskDueAt !== null && nextTaskDueAt <= dueSoonLimit) {
+          if (bestDueSoonProject === null) {
+            bestDueSoonProject = proj;
+            bestNextDueDate = nextTaskDueAt;
+          } else {
+            if (bestNextDueDate && nextTaskDueAt < bestNextDueDate) {
+              bestDueSoonProject = proj;
+              bestNextDueDate = nextTaskDueAt;
+            } else if (nextTaskDueAt === bestNextDueDate) {
+              if (
+                bestDueSoonProject?.createdAt &&
+                proj.createdAt < bestDueSoonProject?.createdAt
+              ) {
+                bestDueSoonProject = proj;
+                bestNextDueDate = nextTaskDueAt;
+              } else if (proj.createdAt === bestDueSoonProject?.createdAt) {
+                if (proj.id < bestDueSoonProject.id) {
+                  bestDueSoonProject = proj;
+                  bestNextDueDate = nextTaskDueAt;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      if (bestDueSoonProject !== null) {
+        res.focusNow.project = bestDueSoonProject;
+        res.focusNow.reason = FOCUSNOW_REASON.DUE_SOON_TASK;
+        res.focusNow.evidence.nextTaskDueAt = bestNextDueDate?.toISOString();
+
+        return res;
+      }
     }
+
     return res;
   }
 
